@@ -5,6 +5,7 @@
 #include "GameEntity.h"
 #include "Material.h"
 #include "Input.h"
+#include "irrKlang.h"
 
 //TODO - maybe make some #define macro for a print if debug?
 //TODO - make an Engine class with a specific Init() and Run() function such that
@@ -12,6 +13,11 @@
 
 int main()
 {
+
+	irrklang::ISoundEngine* engine = irrklang::createIrrKlangDevice();
+
+	engine->play2D("../libraries/irrKlang-1.5.0/media/getout.ogg", true);
+
     {
         //init GLFW
         {
@@ -84,12 +90,12 @@ int main()
 
             //create vS and attach to shader program
             Shader *vs = new Shader();
-            vs->InitFromFile("assets/shaders/vertexShader.glsl", GL_VERTEX_SHADER);
+            vs->InitFromFile("../assets/shaders/vertexShader.glsl", GL_VERTEX_SHADER);
             glAttachShader(shaderProgram, vs->GetShaderLoc());
 
             //create FS and attach to shader program
             Shader *fs = new Shader();
-            fs->InitFromFile("assets/shaders/fragmentShader.glsl", GL_FRAGMENT_SHADER);
+            fs->InitFromFile("../assets/shaders/fragmentShader.glsl", GL_FRAGMENT_SHADER);
             glAttachShader(shaderProgram, fs->GetShaderLoc());
 
             //link everything that's attached together
