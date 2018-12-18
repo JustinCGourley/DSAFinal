@@ -5,6 +5,7 @@
 #include "GameEntity.h"
 #include "Material.h"
 #include "Input.h"
+#include "irrKlang.h"
 
 //TODO - maybe make some #define macro for a print if debug?
 //TODO - make an Engine class with a specific Init() and Run() function such that
@@ -12,6 +13,11 @@
 
 int main()
 {
+
+	irrklang::ISoundEngine* engine = irrklang::createIrrKlangDevice();
+
+	engine->play2D("../libraries/irrKlang-1.5.0/media/getout.ogg", true);
+
     {
         //init GLFW
         {
