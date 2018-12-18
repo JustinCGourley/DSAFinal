@@ -128,7 +128,6 @@ int main()
         std::cout << "Shaders compiled attached, and linked!" << std::endl;
 #endif // _DEBUG
 
-		int cubeCount = 20;
 		 
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
@@ -181,24 +180,23 @@ int main()
 
 		srand(time(NULL));
 
+		int cubeCount = 10;
+
 		std::vector<GameEntity*> gameEntities;
 		int maxLoop = 50;
 		for (int i = 0; i < cubeCount; i++)
 		{
 			bool next = true;
-			float randomX, randomY;
+			float randomX, randomY, randomZ;
 			maxLoop = 50;
 			do 
 			{
 				next = true;
 				//get a random x and y
 				randomX = -13.8f + (static_cast <float> (rand() / (static_cast <float> (RAND_MAX / (13.8f - (-13.8f))))));
-				randomY = -9.7f + (static_cast <float> (rand() / (static_cast <float> (RAND_MAX / (9.7f - (-9.7f))))));
-				if (i == 0)
-				{
-					randomX = -13.8f;
-					randomY = -9.7f;
-				}
+				randomY = (static_cast <float> (rand() / (static_cast <float> (RAND_MAX / (9.7f - (-9.7f))))));
+				randomZ = 5.f + (static_cast <float> (rand() / (static_cast <float> (RAND_MAX / (20.f - (5.f))))));
+				
 				//see if this position will intersect with another cube | if so, remake the position
 				for (int j = 0; j < i; j++)
 				{
@@ -218,54 +216,16 @@ int main()
 			GameEntity* myGameEntity = new GameEntity(
 				myMesh,
 				myMaterial,
-				glm::vec3(randomX, randomY, 1.5f),
+				glm::vec3(randomX, randomY, randomZ),
 				glm::vec3(0.f, 0.f, 0.f),
 				glm::vec3(1.f, 1.f, 1.f),
-				glm::vec3((rand() % 255) / 255.f, (rand() % 255) / 255.f, (rand() % 255) / 255.f)
+				glm::vec3(0.8f, 0.8f, 0.8f),
+				true,
+				glm::vec3(1.f, 1.f, 1.f)
 			);
 			gameEntities.push_back(myGameEntity);
 		}
 
-
-		//set up list of trigger points
-		std::vector<int> graph;
-
-		graph.push_back(0);
-
-		int nextCheck = 0;
-
-		do 
-		{
-
-			float closest = -1;
-			int index = -1;
-			for (int i = 0; i < gameEntities.size(); i++)
-			{
-				//find closest next point to add that hasnt already been added to the list
-				float distance = glm::distance(gameEntities[nextCheck]->position, gameEntities[i]->position);
-				if (distance < closest || closest == -1)
-				{
-					bool found = false;
-					for (int j = 0; j < graph.size(); j++)
-					{
-						if (graph[j] == i)
-						{
-							found = true;
-						}
-					}
-
-					if (!found)
-					{
-						closest = distance;
-						index = i;
-					}
-				}
-			}
-
-			graph.push_back(index);
-			nextCheck = index;
-
-		} while (graph.size() < cubeCount);
 
 		Mesh* floorMesh = new Mesh();
 		floorMesh->InitWithVertexArray(vertices, _countof(vertices), shaderProgram);
@@ -276,9 +236,13 @@ int main()
 			myMaterial,
 			glm::vec3(0.f, -10.f, 0.f),
 			glm::vec3(0.f, 0.f, 0.f),
-			glm::vec3(100.f, 0.f, 100.f),
-			glm::vec3(255.f, 255.f, 255.f)
+			glm::vec3(100.f, 1.f, 100.f),
+			glm::vec3(0.2f, 0.2f, 0.2f),
+			false,
+			glm::vec3(100.f, 1.f, 100.f)
 		);
+
+		gameEntities.push_back(floor);
 
 		Input::GetInstance()->Init(window);
 
@@ -319,11 +283,10 @@ int main()
             }
 
             /* GAMEPLAY UPDATE */
-			for (int i = 0; i < cubeCount; i++)
+			for (int i = 0; i < gameEntities.size(); i++)
 			{
-				gameEntities[i]->Update();
+				gameEntities[i]->Update(gameEntities, i);
 			}
-			floor->Update();
 			myCamera->Update();
 
 
@@ -336,12 +299,11 @@ int main()
             }
 
             /* RENDER */
-			for (int i = 0; i < cubeCount; i++)
+			for (int i = 0; i < gameEntities.size(); i++)
 			{
 				gameEntities[i]->Render(myCamera);
 			}
 
-			floor->Render(myCamera);
 
             /* POST-RENDER */
             {

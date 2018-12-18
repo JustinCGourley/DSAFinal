@@ -16,7 +16,14 @@ private:
     //TODO - maybe this should be in a transform class?
     glm::mat4 worldMatrix;
 
-	bool applyPhysics;
+	glm::vec3 velocity;
+	glm::vec3 collider;
+
+	void UpdatePhysics();
+	void CheckCollisions(std::vector<GameEntity*>, int num);
+	void UpdatePosition();
+
+
 public: 
     /// <summary>
     /// Basic paramterized constructor for most of our private vars
@@ -27,14 +34,17 @@ public:
         glm::vec3 position,
         glm::vec3 eulerAngles,
         glm::vec3 scale,
-		glm::vec3 color
+		glm::vec3 color,
+		bool applyPhysics,
+		glm::vec3 collider
     );
 
 	glm::vec3 position;
 	glm::vec3 eulerAngles;
 	glm::vec3 scale;
 	glm::vec3 color;
-
+	bool applyPhysics;
+	bool applyGravity;
     /// <summary>
     /// Destruction
     /// </summary>
@@ -43,12 +53,15 @@ public:
     /// <summary>
     /// Updates the worldMatrix
     /// </summary>
-    virtual void Update();
 
     /// <summary>
     /// Renders the gameEntity based on a camera
     /// </summary>
     void Render(Camera* camera);
+
+	virtual void Update(std::vector<GameEntity*>, int num);
+
+	void ApplyForce(glm::vec3 force);
 
 };
 
