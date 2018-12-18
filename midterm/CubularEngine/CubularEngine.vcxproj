@@ -77,11 +77,11 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)libraries\GLFW\include;$(SolutionDir)libraries\GLEW\include;$(SolutionDir)libraries\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)libraries\GLFW\include;$(SolutionDir)libraries\GLEW\include;$(SolutionDir)libraries\glm;$(SolutionDir)libraries\irrKlang-1.5.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(SolutionDir)libraries\GLEW\lib\Release\Win32;$(SolutionDir)libraries\GLFW\lib-vc2015;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glew32s.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)libraries\GLEW\lib\Release\Win32;$(SolutionDir)libraries\GLFW\lib-vc2015;$(SolutionDir)libraries\irrKlang-1.5.0\lib\Win32-visualStudio;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glew32s.lib;glfw3.lib;irrKlang.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>mkdir "$(OutDir)assets"
