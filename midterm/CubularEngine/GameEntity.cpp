@@ -8,7 +8,8 @@ GameEntity::GameEntity(Mesh * mesh,
     glm::vec3 scale,
 	glm::vec3 color,
 	bool applyPhysics,
-	glm::vec3 collider)
+	glm::vec3 collider,
+	float weight)
 {
     this->mesh = mesh;
     this->material = material;
@@ -21,7 +22,7 @@ GameEntity::GameEntity(Mesh * mesh,
 	this->applyPhysics = applyPhysics;
 	this->collider = collider;
 	this->applyGravity = true;
-	
+	this->weight = weight;
 	this->velocity = glm::vec3(0, 0, 0);
 }
 

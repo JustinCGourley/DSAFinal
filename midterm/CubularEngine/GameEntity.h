@@ -36,7 +36,8 @@ public:
         glm::vec3 scale,
 		glm::vec3 color,
 		bool applyPhysics,
-		glm::vec3 collider
+		glm::vec3 collider,
+		float weight
     );
 
 	glm::vec3 position;
@@ -45,6 +46,7 @@ public:
 	glm::vec3 color;
 	bool applyPhysics;
 	bool applyGravity;
+	float weight;
     /// <summary>
     /// Destruction
     /// </summary>
