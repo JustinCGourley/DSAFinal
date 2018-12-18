@@ -174,7 +174,7 @@ int main()
 
 		srand(time(NULL));
 
-		int cubeCount = 10;
+		int cubeCount = 100;
 
 		std::vector<GameEntity*> gameEntities;
 		int maxLoop = 50;

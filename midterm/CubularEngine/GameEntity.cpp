@@ -101,14 +101,14 @@ void GameEntity::CheckCollisions(std::vector<GameEntity*> entities, int num)
 					{
 						float overshot = (this->position.x - this->collider.x) - (entities[i]->position.x + entities[i]->collider.x);
 						this->position.x -= overshot;
+						this->velocity.x = 0;
 					}
 					else if (positionDiff.x > 0 && this->velocity.x > 0)
 					{
 						float overshot = (this->position.x + this->collider.x) - (entities[i]->position.x - entities[i]->collider.x);
 						this->position.x -= overshot;
+						this->velocity.x = 0;
 					}
-
-					this->velocity.x = 0;
 				}
 
 
@@ -118,14 +118,14 @@ void GameEntity::CheckCollisions(std::vector<GameEntity*> entities, int num)
 					{
 						float overshot = (this->position.y - this->collider.y) - (entities[i]->position.y + entities[i]->collider.y);
 						this->position.y -= overshot;
+						this->velocity.y = 0;
 					}
 					else if (positionDiff.y > 0 && this->velocity.y > 0)
 					{
 						float overshot = (this->position.y + this->collider.y) - (entities[i]->position.y - entities[i]->collider.y);
 						this->position.y -= overshot;
+						this->velocity.y = 0;
 					}
-					
-					this->velocity.y = 0;
 				}
 
 				if (positionDiff.z != 0)
@@ -134,14 +134,14 @@ void GameEntity::CheckCollisions(std::vector<GameEntity*> entities, int num)
 					{
 						float overshot = (this->position.z + this->collider.z) - (entities[i]->position.z - entities[i]->collider.z);
 						this->position.z -= overshot;
+						this->velocity.z = 0;
 					}
 					else if (positionDiff.z > 0 && this->velocity.z > 0)
 					{
 						float overshot = (this->position.z - this->collider.z) - (entities[i]->position.z + entities[i]->collider.z);
 						this->position.z -= overshot;
+						this->velocity.z = 0;
 					}
-
-					this->velocity.z = 0;
 				}
 			}
 		}
