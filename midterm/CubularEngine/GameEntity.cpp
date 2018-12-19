@@ -1,7 +1,8 @@
 #include "GameEntity.h"
 #include "glm/gtc/matrix_transform.hpp"
 
-GameEntity::GameEntity(Mesh * mesh, 
+GameEntity::GameEntity(
+	Mesh * mesh, 
     Material * material,
     glm::vec3 position, 
     glm::vec3 eulerAngles, 
@@ -40,13 +41,8 @@ void GameEntity::Update(std::vector<GameEntity*> entities, int num)
 		this->UpdatePosition();
 	}
 
-
-
 	worldMatrix = glm::translate(glm::identity<glm::mat4>(),
 		this->position);
-
-	worldMatrix = glm::scale(worldMatrix, this->scale);
-
 	worldMatrix = glm::rotate(worldMatrix,
 		this->eulerAngles.y,
 		glm::vec3(0.f, 1.f, 0.f)
@@ -59,6 +55,9 @@ void GameEntity::Update(std::vector<GameEntity*> entities, int num)
 		this->eulerAngles.z,
 		glm::vec3(0.f, 0.f, 1.f)
 	);
+	worldMatrix = glm::scale(worldMatrix, this->scale);
+
+	
 
 }
 

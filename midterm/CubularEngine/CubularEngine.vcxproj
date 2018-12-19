@@ -143,6 +143,7 @@ xcopy "$(SolutionDir)assets" "$(OutDir)assets" /S /Y /E
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="GameEntity.cpp" />
     <ClCompile Include="Input.cpp" />
+    <ClCompile Include="Interpolate.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Mesh.cpp" />
@@ -157,6 +158,7 @@ xcopy "$(SolutionDir)assets" "$(OutDir)assets" /S /Y /E
     <ClInclude Include="Camera.h" />
     <ClInclude Include="GameEntity.h" />
     <ClInclude Include="Input.h" />
+    <ClInclude Include="Interpolate.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Shader.h" />

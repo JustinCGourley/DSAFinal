@@ -10,12 +10,13 @@ Camera::Camera(glm::vec3 position,
     float height,
     float nearZ, 
     float farZ,
-	GLFWwindow* window)
+	GLFWwindow* window,
+	bool controllable)
 {
     this->position = position;
     this->forward = forward; 
     this->up = up;
-
+	
     //does this calculation once
     this->fov = fovAngleY * glm::pi<float>() / 180.0f;
     this->width = width;
@@ -32,6 +33,7 @@ Camera::Camera(glm::vec3 position,
 	this->pitch = 0;
 	this->speed = 1;
 	this->sensativity = 0.04f;
+	this->controllable = controllable;
 }
 
 Camera::~Camera()
@@ -43,67 +45,69 @@ Camera::~Camera()
 //       (something like UpdateInput() and UpdateMatrices())
 void Camera::Update()
 {
-    if (Input::GetInstance()->IsKeyDown(GLFW_KEY_A))
-    {
-        position -= right * speed;    
-    } 
-    else if (Input::GetInstance()->IsKeyDown(GLFW_KEY_D))
-    {
-        position += right * speed;
-    } 
-	if (Input::GetInstance()->IsKeyDown(GLFW_KEY_W))
+	if (controllable)
 	{
-		position += forward * speed;
-	}
-	else if (Input::GetInstance()->IsKeyDown(GLFW_KEY_S))
-	{
-		position -= forward * speed;
-	}
-	if (Input::GetInstance()->IsKeyDown(GLFW_KEY_E))
-	{
-		position += up * speed;
-	}
-	else if (Input::GetInstance()->IsKeyDown(GLFW_KEY_Q))
-	{
-		position -= up * speed;
-	}
+		if (Input::GetInstance()->IsKeyDown(GLFW_KEY_A))
+		{
+			position -= right * speed;
+		}
+		else if (Input::GetInstance()->IsKeyDown(GLFW_KEY_D))
+		{
+			position += right * speed;
+		}
+		if (Input::GetInstance()->IsKeyDown(GLFW_KEY_W))
+		{
+			position += forward * speed;
+		}
+		else if (Input::GetInstance()->IsKeyDown(GLFW_KEY_S))
+		{
+			position -= forward * speed;
+		}
+		if (Input::GetInstance()->IsKeyDown(GLFW_KEY_E))
+		{
+			position += up * speed;
+		}
+		else if (Input::GetInstance()->IsKeyDown(GLFW_KEY_Q))
+		{
+			position -= up * speed;
+		}
 
 
-	
-	if (start)
-	{
-		double *getX = &lastX;
-		double *getY = &lastY;
+
+		if (start)
+		{
+			double *getX = &lastX;
+			double *getY = &lastY;
+			glfwGetCursorPos(window, getX, getY);
+
+			start = false;
+		}
+
+		double *getX = &finalX;
+		double *getY = &finalY;
 		glfwGetCursorPos(window, getX, getY);
 
-		start = false;
+		float xDistance = lastX - finalX;
+		float yDistance = lastY - finalY;
+
+		xDistance *= sensativity;
+		yDistance *= sensativity;
+
+		pitch += yDistance;
+		if (pitch > 89.0f)
+			pitch = 89.0f;
+		if (pitch < -89.0f)
+			pitch = -89.0f;
+
+		yaw += xDistance;
+
+		forward.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+		forward.y = sin(glm::radians(pitch));
+		forward.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+
+		lastX = finalX;
+		lastY = finalY;
 	}
-
-	double *getX = &finalX;
-	double *getY = &finalY;
-	glfwGetCursorPos(window, getX, getY);
-
-	float xDistance = lastX - finalX;
-	float yDistance = lastY - finalY;
-
-	xDistance *= sensativity;
-	yDistance *= sensativity;
-
-	pitch += yDistance;
-	if (pitch > 89.0f)
-		pitch = 89.0f;
-	if (pitch < -89.0f)
-		pitch = -89.0f;
-
-	yaw += xDistance;
-
-	forward.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-	forward.y = sin(glm::radians(pitch));
-	forward.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-
-	lastX = finalX;
-	lastY = finalY;
-
 
     //this call may not be needed every frame
     forward = glm::normalize<3>(forward);   

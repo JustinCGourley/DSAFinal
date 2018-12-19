@@ -30,6 +30,7 @@ private:
 	double lastX, lastY;
 
 	float sensativity;
+	bool controllable;
 public:
 
     /// <summary>
@@ -44,7 +45,8 @@ public:
         float height,
         float nearZ,
         float farZ,
-		GLFWwindow* window
+		GLFWwindow* window,
+		bool controllable
     );
 
     /// <summary>

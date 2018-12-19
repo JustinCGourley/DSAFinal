@@ -7,14 +7,53 @@
 #include "Input.h"
 #include "irrKlang.h"
 #include "BezierCurve.h"
+#include "Interpolate.h"
 
-//TODO - maybe make some #define macro for a print if debug?
-//TODO - make an Engine class with a specific Init() and Run() function such that
-//       our Main.cpp is kept clean and tidy
 
+//methods
 void CreateManyCubes(Mesh*, Material*);
-void CreateBezierExample(Mesh*, Material*);
+void CreateBezierExample(Mesh*, Material*, BezierCurve*);
+void UpdateBezierExample(BezierCurve *, GameEntity *);
+void UpdateScaleExample(GameEntity *);
+void UpdateLERPExample(GameEntity *);
+void UpdateSLERPExample(GameEntity *);
+void SetupLERPExample(Mesh *, Material *);
+void SetupSLERPExample(Mesh *, Material *);
+Camera* CreateCamera(glm::vec3 pos, glm::vec3 forward, glm::vec3 up, int width, int height, GLFWwindow *window, bool controllable);
+void CheckUpdateCameras();
+
 std::vector<GameEntity*> gameEntities;
+
+
+//bezier cube example vars
+float bezierCubeTime = 0;
+float bezierCubeStep = 1.f / 500.f;
+bool bezierDirForward = true;
+
+//scaling example
+int scalingDir = 0;
+float scaleAmount = 1.f;
+
+//interpolation declaration
+Interpolate interpolate;
+
+//LERP example
+glm::vec3 lerpStart = glm::vec3(50.f, 10.f, 5.f);
+glm::vec3 lerpEnd = glm::vec3(60.f, 5.f, 10.f);
+float lerpTime = 0;
+float lerpStep = 1.f / 100.f;
+bool lerpDirForward = true;
+
+//SLERP example
+glm::vec3 slerpStart = glm::vec3(70.f, 10.f, 5.f);
+glm::vec3 slerpEnd = glm::vec3(80.f, 5.f, 10.f);
+float slerpTime = 0;
+float slerpStep = 1.f / 100.f;
+bool slerpDirForward = true;
+
+std::vector<Camera*> cameras;
+int curCamera = 0;
+bool cameraSwap = false;
 
 int main()
 {
@@ -177,17 +216,88 @@ int main()
             1.0f,-1.0f, 1.0f
         };
 
-		//create a bunch of cubes
+		//=================== create a bunch of cubes=============================
 		Mesh* myMesh = new Mesh();
 		myMesh->InitWithVertexArray(vertices, _countof(vertices), shaderProgram);
 		Material* myMaterial = new Material(shaderProgram);
 		CreateManyCubes(myMesh, myMaterial);
 
-		//create bezier cubes
+		//==================== create bezier cubes==================================
 		Mesh* bMesh = new Mesh();
 		bMesh->InitWithVertexArray(vertices, _countof(vertices), shaderProgram);
 		Material* bMat = new Material(shaderProgram);
-		CreateBezierExample(bMesh, bMat);
+
+
+		glm::vec2 curveStart = glm::vec2(20.f, 10.f);
+		BezierCurve* bezierCurve = new BezierCurve(curveStart, glm::vec2(10, 10), glm::vec2(5, 20), glm::vec2(25, 20));
+		CreateBezierExample(bMesh, bMat, bezierCurve);
+
+		GameEntity* bezierCube = new GameEntity(
+			bMesh,
+			bMat,
+			glm::vec3(curveStart.x, curveStart.y, 5),
+			glm::vec3(0.f, 0.f, 0.f),
+			glm::vec3(0.4f, 0.4f, 0.4f),
+			glm::vec3(0.13f, 0.73f, 0.27f),
+			false,
+			glm::vec3(0.f, 0.f, 0.f),
+			0
+		);
+
+		gameEntities.push_back(bezierCube);
+
+		//============ create scaling example=============================
+		GameEntity* scaleExample = new GameEntity(
+			bMesh,
+			bMat,
+			glm::vec3(40, 5, 5),
+			glm::vec3(0.f, 0.f, 0.f),
+			glm::vec3(1.f, 1.f, 1.f),
+			glm::vec3(0.8f, 0.8f, 0.8f),
+			false,
+			glm::vec3(0.f, 0.f, 0.f),
+			0
+		);
+
+		gameEntities.push_back(scaleExample);
+
+		//================== create lerp example ========================
+
+		SetupLERPExample(bMesh, bMat);
+
+		//moving var
+		GameEntity* lerpExample = new GameEntity(
+			bMesh,
+			bMat,
+			lerpStart,
+			glm::vec3(0.f, 0.f, 0.f),
+			glm::vec3(0.5f, 0.5f, 0.5f),
+			glm::vec3(0.8f, 0.8f, 0.8f),
+			false,
+			glm::vec3(0.f, 0.f, 0.f),
+			0
+		);
+
+		gameEntities.push_back(lerpExample);
+
+		//================== create slerp example ========================
+
+		SetupSLERPExample(bMesh, bMat);
+
+		//moving var
+		GameEntity* slerpExample = new GameEntity(
+			bMesh,
+			bMat,
+			slerpStart,
+			glm::vec3(0.f, 0.f, 0.f),
+			glm::vec3(0.5f, 0.5f, 0.5f),
+			glm::vec3(0.8f, 0.8f, 0.8f),
+			false,
+			glm::vec3(0.f, 0.f, 0.f),
+			0
+		);
+
+		gameEntities.push_back(slerpExample);
 
 		//create floor 
 		Mesh* floorMesh = new Mesh();
@@ -211,26 +321,54 @@ int main()
 
 		Input::GetInstance()->Init(window);
 
-		//setup and create camera
-        //TODO - maybe a CameraManager?
-        Camera* myCamera = new Camera(
-            glm::vec3(0.0f, 0.0f, -20.f),    //position of camera
-            glm::vec3(0.0f, 0.0f, 1.f),     //the 'forward' of the camera
-            glm::vec3(0.0f, 1.f, 0.0f),     //what 'up' is for the camera
-            60.0f,                          //the field of view in radians
-            (float)width,                   //the width of the window in float
-            (float)height,                  //the height of the window in float
-            0.01f,                          //the near Z-plane
-            500.f,							//far z-plane
-			window
-        );
+		//=====================================setup cameras==========================================
+		Camera* freeCam = CreateCamera(
+			glm::vec3(0.0f, 0.0f, -20.f),
+			glm::vec3(0.0f, 0.0f, 1.f),
+			glm::vec3(0.0f, 1.f, 0.0f),
+			width,
+			height,
+			window,
+			true);
 
+		cameras.push_back(freeCam);
+
+		Camera* camBezier = CreateCamera(
+			glm::vec3(15.f, 15.f, -20.f),
+			glm::vec3(0.0f, 0.0f, 1.f),
+			glm::vec3(0.0f, 1.f, 0.0f),
+			width,
+			height,
+			window,
+			false);
+
+		Camera* camScale = CreateCamera(
+			glm::vec3(40.f, 5.f, -20.f),
+			glm::vec3(0.0f, 0.0f, 1.f),
+			glm::vec3(0.0f, 1.f, 0.0f),
+			width,
+			height,
+			window,
+			false);
+
+		Camera* camLERP = CreateCamera(
+			glm::vec3(55.f, 7.5f, -20.f),
+			glm::vec3(0.0f, 0.0f, 1.f),
+			glm::vec3(0.0f, 1.f, 0.0f),
+			width,
+			height,
+			window,
+			false);
+
+		cameras.push_back(camBezier);
+		cameras.push_back(camScale);
+		cameras.push_back(camLERP);
 
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LESS);
 
 
-        //main loop
+        //--------------------================================start main loop========================----------------------------
         while (!glfwWindowShouldClose(window))
         {
             /* INPUT */
@@ -247,12 +385,27 @@ int main()
             }
 
             /* GAMEPLAY UPDATE */
+
 			for (int i = 0; i < gameEntities.size(); i++)
 			{
 				gameEntities[i]->Update(gameEntities, i);
 			}
-			myCamera->Update();
+			cameras[curCamera]->Update();
 
+			//update bezier example
+			UpdateBezierExample(bezierCurve, bezierCube);
+
+			//update scaling example
+			UpdateScaleExample(scaleExample);
+
+			//update lerp example
+			UpdateLERPExample(lerpExample);
+
+			//update slerp example
+			UpdateSLERPExample(slerpExample);
+
+			//update cameras
+			CheckUpdateCameras();
 
             /* PRE-RENDER */
             {
@@ -265,7 +418,7 @@ int main()
             /* RENDER */
 			for (int i = 0; i < gameEntities.size(); i++)
 			{
-				gameEntities[i]->Render(myCamera);
+				gameEntities[i]->Render(cameras[curCamera]);
 			}
 
 
@@ -294,7 +447,10 @@ int main()
 			delete gameEntities[i];
 		}
 		//cubeGraph.clear();
-        delete myCamera;
+		for (int i = 0; i < cameras.size(); i++)
+		{
+			delete cameras[i];
+		}
         Input::Release();
     }
 
@@ -357,10 +513,9 @@ void CreateManyCubes(Mesh* myMesh, Material* myMaterial)
 	}
 }
 
-void CreateBezierExample(Mesh* bMesh, Material* bMat)
+void CreateBezierExample(Mesh* bMesh, Material* bMat, BezierCurve* bezierCurve)
 {
 	int pointCount = 100;
-	BezierCurve* bezierCurve = new BezierCurve(glm::vec2(20, 10), glm::vec2(10, 10), glm::vec2(5, 20), glm::vec2(25, 20));
 
 	float interval = (float)(1.f / pointCount);
 	for (int i = 0; i < pointCount; i++)
@@ -372,12 +527,271 @@ void CreateBezierExample(Mesh* bMesh, Material* bMat)
 			bMat,
 			glm::vec3(pos.x, pos.y, 5),
 			glm::vec3(0.f, 0.f, 0.f),
-			glm::vec3(0.01f, 0.01f, 0.01f),
+			glm::vec3(0.02f, 0.02f, 0.02f),
 			glm::vec3(0.8f, 0.8f, 0.8f),
 			false,
-			glm::vec3(1.f, 1.f, 1.f),
+			glm::vec3(0.f, 0.f, 0.f),
 			0
 		);
 		gameEntities.push_back(myGameEntity);
+	}
+
+	glm::vec2 pos = bezierCurve->GetPoint(0);
+	GameEntity* start = new GameEntity(
+		bMesh,
+		bMat,
+		glm::vec3(pos.x, pos.y, 5),
+		glm::vec3(0.f, 0.f, 0.f),
+		glm::vec3(0.1f, 0.1f, 0.1f),
+		glm::vec3(1.0f, 0.f, 0.0f),
+		false,
+		glm::vec3(0.f, 0.f, 0.f),
+		0
+	);
+
+	pos = bezierCurve->GetPoint(1);
+	GameEntity* end = new GameEntity(
+		bMesh,
+		bMat,
+		glm::vec3(pos.x, pos.y, 5),
+		glm::vec3(0.f, 0.f, 0.f),
+		glm::vec3(0.1f, 0.1f, 0.1f),
+		glm::vec3(0.0f, 1.f, 0.0f),
+		false,
+		glm::vec3(0.f, 0.f, 0.f),
+		0
+	);
+
+	gameEntities.push_back(start);
+	gameEntities.push_back(end);
+}
+
+void UpdateBezierExample(BezierCurve *bezierCurve, GameEntity *gameObj)
+{
+	bezierCubeTime += (bezierDirForward) ? bezierCubeStep : -bezierCubeStep;
+
+	if (bezierCubeTime >= 1.f) { bezierCubeTime = 1.f; bezierDirForward = false; }
+	else if (bezierCubeTime <= 0) { bezierCubeTime = 0.f; bezierDirForward = true; }
+
+
+	glm::vec2 newPos = bezierCurve->GetPoint(bezierCubeTime);
+
+	gameObj->position.x = newPos.x;
+	gameObj->position.y = newPos.y;
+	gameObj->position.z = 5;
+}
+
+void UpdateScaleExample(GameEntity *gameObj)
+{
+	glm::vec3 scaleSet = glm::vec3(1.f, 1.f, 1.f);
+	scaleAmount += (scalingDir % 2 == 0) ? 0.01f : -0.01f;
+
+	if (scaleAmount >= 2.f || scaleAmount <= 1.f)
+	{
+		scaleAmount = (scaleAmount >= 2.f) ? 2.f : 1.f;
+		scalingDir++;
+		if (scalingDir == 6) { scalingDir = 0; }
+	}
+
+	if (scalingDir == 0 || scalingDir == 1)
+	{
+		scaleSet.x = scaleAmount;
+	}
+	else if (scalingDir == 2 || scalingDir == 3)
+	{
+		scaleSet.y = scaleAmount;
+	}
+	else
+	{
+		scaleSet.z = scaleAmount;
+	}
+
+	gameObj->scale = scaleSet;
+	gameObj->eulerAngles.y += 0.001f;
+}
+
+void SetupLERPExample(Mesh *bMesh, Material *bMat)
+{
+	int pointCount = 100;
+	float step = 1.f / pointCount;
+
+	for (int i = 0; i < pointCount; i++)
+	{
+		float t = step * i;
+
+		GameEntity* obj = new GameEntity(
+			bMesh,
+			bMat,
+			interpolate.LERP(lerpStart, lerpEnd, t),
+			glm::vec3(0.f, 0.f, 0.f),
+			glm::vec3(.02f, .02f, .02f),
+			glm::vec3(0.8f, 0.8f, 0.8f),
+			false,
+			glm::vec3(0.f, 0.f, 0.f),
+			0
+		);
+
+		gameEntities.push_back(obj);
+	}
+
+	//start / end pos
+	GameEntity* lerpStartObj = new GameEntity(
+		bMesh,
+		bMat,
+		lerpStart,
+		glm::vec3(0.f, 0.f, 0.f),
+		glm::vec3(.1f, .1f, .1f),
+		glm::vec3(1.0f, 0.0f, 0.0f),
+		false,
+		glm::vec3(0.f, 0.f, 0.f),
+		0
+	);
+	GameEntity* lerpEndObj = new GameEntity(
+		bMesh,
+		bMat,
+		lerpEnd,
+		glm::vec3(0.f, 0.f, 0.f),
+		glm::vec3(.1f, .1f, .1f),
+		glm::vec3(0.0f, 1.0f, 0.0f),
+		false,
+		glm::vec3(0.f, 0.f, 0.f),
+		0
+	);
+
+	gameEntities.push_back(lerpStartObj);
+	gameEntities.push_back(lerpEndObj);
+}
+
+void SetupSLERPExample(Mesh *bMesh, Material *bMat)
+{
+	int pointCount = 100;
+	float step = 1.f / pointCount;
+
+	for (int i = 0; i < pointCount; i++)
+	{
+		float t = step * i;
+		glm::vec3 pos = interpolate.SLERP(slerpStart, slerpEnd, t);
+		std::cout << "Creating new obj @: [" << pos.x << ", " << pos.y << ", " << pos.z << "]@t: " << t << std::endl;
+		GameEntity* obj = new GameEntity(
+			bMesh,
+			bMat,
+			interpolate.SLERP(slerpStart, slerpEnd, t),
+			glm::vec3(0.f, 0.f, 0.f),
+			glm::vec3(.02f, .02f, .02f),
+			glm::vec3(0.8f, 0.8f, 0.8f),
+			false,
+			glm::vec3(0.f, 0.f, 0.f),
+			0
+		);
+
+		gameEntities.push_back(obj);
+	}
+
+	//start / end pos
+	GameEntity* slerpStartObj = new GameEntity(
+		bMesh,
+		bMat,
+		slerpStart,
+		glm::vec3(0.f, 0.f, 0.f),
+		glm::vec3(.1f, .1f, .1f),
+		glm::vec3(1.0f, 0.0f, 0.0f),
+		false,
+		glm::vec3(0.f, 0.f, 0.f),
+		0
+	);
+	GameEntity* slerpEndObj = new GameEntity(
+		bMesh,
+		bMat,
+		slerpEnd,
+		glm::vec3(0.f, 0.f, 0.f),
+		glm::vec3(.1f, .1f, .1f),
+		glm::vec3(0.0f, 1.0f, 0.0f),
+		false,
+		glm::vec3(0.f, 0.f, 0.f),
+		0
+	);
+
+	gameEntities.push_back(slerpStartObj);
+	gameEntities.push_back(slerpEndObj);
+}
+
+void UpdateLERPExample(GameEntity *gameObj)
+{
+	lerpTime += (lerpDirForward) ? lerpStep : -lerpStep;
+	if (lerpTime >= 1.f || lerpTime <= 0.f) { lerpDirForward = !lerpDirForward; }
+
+	glm::vec3 pos = interpolate.LERP(lerpStart, lerpEnd, lerpTime);
+
+	gameObj->position = pos;
+}
+
+//TODO: update this SLERP to be rotations instead of movement (oops)
+void UpdateSLERPExample(GameEntity *gameObj)
+{
+	slerpTime += (slerpDirForward) ? slerpStep : -slerpStep;
+	if (slerpTime >= 1.f || slerpTime <= 0.f) { slerpDirForward = !slerpDirForward; }
+
+	//glm::vec3 pos = interpolate.SLERP(slerpStart, slerpEnd, slerpTime);
+
+	//gameObj->position = pos;
+}
+
+Camera* CreateCamera(glm::vec3 pos, glm::vec3 forward, glm::vec3 up, int width, int height, GLFWwindow *window, bool control)
+{
+	Camera* camera = new Camera(
+		pos,    //position of camera
+		forward,     //the 'forward' of the camera
+		up,     //what 'up' is for the camera
+		60.0f,                          //the field of view in radians
+		(float)width,                   //the width of the window in float
+		(float)height,                  //the height of the window in float
+		0.01f,                          //the near Z-plane
+		500.f,							//far z-plane
+		window,
+		control
+	);
+
+	return camera;
+}
+
+void CheckUpdateCameras()
+{
+	if (Input::GetInstance()->IsKeyDown(GLFW_KEY_RIGHT) && !cameraSwap)
+	{
+		curCamera++;
+		if (curCamera >= cameras.size())
+		{
+			curCamera = 0;
+		}
+		cameraSwap = true;
+	}
+	else if (Input::GetInstance()->IsKeyDown(GLFW_KEY_LEFT) && !cameraSwap)
+	{
+		curCamera--;
+		if (curCamera < 0)
+		{
+			curCamera = cameras.size() - 1;
+		}
+		cameraSwap = true;
+	}
+
+	if (Input::GetInstance()->IsKeyDown(GLFW_KEY_LEFT) == false && Input::GetInstance()->IsKeyDown(GLFW_KEY_RIGHT) == false && cameraSwap)
+	{
+		cameraSwap = false;
+	}
+
+	//do all the changing of tests in here
+	
+	if (curCamera == 1)//bezier curve
+	{
+
+	}
+	else if (curCamera == 2)//scaling cube
+	{
+
+	}
+	else if (curCamera == 3)//lerp
+	{
+
 	}
 }

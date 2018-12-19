@@ -11,6 +11,7 @@ Mesh::~Mesh()
 
 void Mesh::InitWithVertexArray(GLfloat vertices[], size_t count, GLuint shaderProgram)
 {
+	lastShaderProgram = shaderProgram;
     //allocate space for all these vertices
     this->vertices = std::vector<GLfloat>(count);
     memcpy(&(this->vertices[0]), vertices, count * sizeof(GLfloat));

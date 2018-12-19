@@ -1,8 +1,5 @@
 #pragma once
 #include "stdafx.h"
-#include "Mesh.h"
-#include "Material.h"
-#include "Camera.h"
 
 class BezierCurve
 {

@@ -36,11 +36,14 @@ public:
     /// Bind our VAO and draw our shape!
     /// </summary>
     void Render();
+	//vector of vertices
+	std::vector<GLfloat> vertices;
 
+	//how many vertices we have
+	GLsizei vertCount;
+	GLuint lastShaderProgram;
 private:
 
-    //vector of vertices
-    std::vector<GLfloat> vertices;
     
     //our VAO
     GLuint VAO;
@@ -48,8 +51,6 @@ private:
     //our VBO
     GLuint VBO;
     
-    //how many vertices we have
-    GLsizei vertCount;
 
     /// <summary>
     /// Helper function to create the VAO & VBO
