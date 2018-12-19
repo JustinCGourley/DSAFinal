@@ -317,8 +317,8 @@ int main()
 			glm::vec3(0.2f, 0.2f, 0.2f),
 			false,
 			glm::vec3(100.f, 1.f, 100.f),
-			0,
-			"Floor"
+			1,
+			"ground"
 		);
 
 		gameEntities.push_back(floor);
@@ -395,6 +395,7 @@ int main()
 			{
 				gameEntities[i]->Update(gameEntities, i);
 			}
+			gameEntities[0]->ApplyForce(glm::vec3(0.001f, 0.0f, 0.0f));
 			cameras[curCamera]->Update();
 
 			//update bezier example
@@ -484,8 +485,10 @@ void CreateManyCubes(Mesh* myMesh, Material* myMaterial)
 			next = true;
 			//get a random x and y
 			randomX = -13.8f + (static_cast <float> (rand() / (static_cast <float> (RAND_MAX / (13.8f - (-13.8f))))));
-			randomY = (static_cast <float> (rand() / (static_cast <float> (RAND_MAX / (9.7f - (-9.7f))))));
-			randomZ = 5.f + (static_cast <float> (rand() / (static_cast <float> (RAND_MAX / (20.f - (5.f))))));
+			//randomY = (static_cast <float> (rand() / (static_cast <float> (RAND_MAX / (9.7f - (-9.7f))))));
+			randomY = 0;
+			//randomZ = 5.f + (static_cast <float> (rand() / (static_cast <float> (RAND_MAX / (20.f - (5.f))))));
+			randomZ = 0;
 
 			//see if this position will intersect with another cube | if so, remake the position
 			for (int j = 0; j < i; j++)
@@ -513,7 +516,7 @@ void CreateManyCubes(Mesh* myMesh, Material* myMaterial)
 			true,
 			glm::vec3(1.f, 1.f, 1.f),
 			1,
-			"Object"
+			"cube"
 		);
 		gameEntities.push_back(myGameEntity);
 	}
