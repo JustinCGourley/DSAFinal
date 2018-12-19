@@ -139,6 +139,7 @@ xcopy "$(SolutionDir)assets" "$(OutDir)assets" /S /Y /E
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BezierCurve.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="GameEntity.cpp" />
     <ClCompile Include="Input.cpp" />
@@ -152,6 +153,7 @@ xcopy "$(SolutionDir)assets" "$(OutDir)assets" /S /Y /E
     <None Include="..\assets\shaders\vertexShader.glsl" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BezierCurve.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="GameEntity.h" />
     <ClInclude Include="Input.h" />

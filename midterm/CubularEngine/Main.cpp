@@ -6,17 +6,22 @@
 #include "Material.h"
 #include "Input.h"
 #include "irrKlang.h"
+#include "BezierCurve.h"
 
 //TODO - maybe make some #define macro for a print if debug?
 //TODO - make an Engine class with a specific Init() and Run() function such that
 //       our Main.cpp is kept clean and tidy
+
+void CreateManyCubes(Mesh*, Material*);
+void CreateBezierExample(Mesh*, Material*);
+std::vector<GameEntity*> gameEntities;
 
 int main()
 {
 
 	irrklang::ISoundEngine* engine = irrklang::createIrrKlangDevice();
 
-	engine->play2D("../libraries/irrKlang-1.5.0/media/getout.ogg", true);
+	//engine->play2D("../libraries/irrKlang-1.5.0/media/getout.ogg", true);
 
     {
         //init GLFW
@@ -172,80 +177,41 @@ int main()
             1.0f,-1.0f, 1.0f
         };
 
-        //create our mesh & material
-        //TODO - maybe have a MeshManager & a MaterialManager
-        Mesh* myMesh = new Mesh();
-        myMesh->InitWithVertexArray(vertices, _countof(vertices), shaderProgram);
-        Material* myMaterial = new Material(shaderProgram);
+		//create a bunch of cubes
+		Mesh* myMesh = new Mesh();
+		myMesh->InitWithVertexArray(vertices, _countof(vertices), shaderProgram);
+		Material* myMaterial = new Material(shaderProgram);
+		CreateManyCubes(myMesh, myMaterial);
 
-		srand(time(NULL));
+		//create bezier cubes
+		Mesh* bMesh = new Mesh();
+		bMesh->InitWithVertexArray(vertices, _countof(vertices), shaderProgram);
+		Material* bMat = new Material(shaderProgram);
+		CreateBezierExample(bMesh, bMat);
 
-		int cubeCount = 100;
-
-		std::vector<GameEntity*> gameEntities;
-		int maxLoop = 50;
-		for (int i = 0; i < cubeCount; i++)
-		{
-			bool next = true;
-			float randomX, randomY, randomZ;
-			maxLoop = 50;
-			do 
-			{
-				next = true;
-				//get a random x and y
-				randomX = -13.8f + (static_cast <float> (rand() / (static_cast <float> (RAND_MAX / (13.8f - (-13.8f))))));
-				randomY = (static_cast <float> (rand() / (static_cast <float> (RAND_MAX / (9.7f - (-9.7f))))));
-				randomZ = 5.f + (static_cast <float> (rand() / (static_cast <float> (RAND_MAX / (20.f - (5.f))))));
-				
-				//see if this position will intersect with another cube | if so, remake the position
-				for (int j = 0; j < i; j++)
-				{
-					if (abs(gameEntities[j]->position.x - randomX) < 2.f && abs(gameEntities[j]->position.y - randomY) < 2.f)
-					{
-						next = false;
-						maxLoop--;
-						if (maxLoop <= 0)
-						{
-							next = true;
-						}
-					}
-				}
-			} while (!next);
-
-			//create the entity, also giving it a random color
-			GameEntity* myGameEntity = new GameEntity(
-				myMesh,
-				myMaterial,
-				glm::vec3(randomX, randomY, randomZ),
-				glm::vec3(0.f, 0.f, 0.f),
-				glm::vec3(1.f, 1.f, 1.f),
-				glm::vec3(0.8f, 0.8f, 0.8f),
-				true,
-				glm::vec3(1.f, 1.f, 1.f)
-			);
-			gameEntities.push_back(myGameEntity);
-		}
-
-
+		//create floor 
 		Mesh* floorMesh = new Mesh();
 		floorMesh->InitWithVertexArray(vertices, _countof(vertices), shaderProgram);
 		Material* floorMat = new Material(shaderProgram);
 
 		GameEntity* floor = new GameEntity(
-			myMesh,
-			myMaterial,
+			floorMesh,
+			floorMat,
 			glm::vec3(0.f, -10.f, 0.f),
 			glm::vec3(0.f, 0.f, 0.f),
 			glm::vec3(100.f, 1.f, 100.f),
 			glm::vec3(0.2f, 0.2f, 0.2f),
 			false,
-			glm::vec3(100.f, 1.f, 100.f)
+			glm::vec3(100.f, 1.f, 100.f),
+			0
 		);
 
 		gameEntities.push_back(floor);
 
+
 		Input::GetInstance()->Init(window);
 
+		//setup and create camera
         //TODO - maybe a CameraManager?
         Camera* myCamera = new Camera(
             glm::vec3(0.0f, 0.0f, -20.f),    //position of camera
@@ -263,9 +229,7 @@ int main()
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LESS);
 
-		int cubeSpinCooldown = 0;
-		int curSpinNum = 0;
-		bool sKeyDown = false;
+
         //main loop
         while (!glfwWindowShouldClose(window))
         {
@@ -318,7 +282,14 @@ int main()
         //de-allocate our mesh!
         delete myMesh;
         delete myMaterial;
-		for (int i = 0; i < cubeCount; i++)
+
+		delete floorMesh;
+		delete floorMat;
+
+		delete bMesh;
+		delete bMat;
+
+		for (int i = 0; i < gameEntities.size(); i++)
 		{
 			delete gameEntities[i];
 		}
@@ -333,4 +304,80 @@ int main()
     _CrtDumpMemoryLeaks();
 #endif // _DEBUG
     return 0;
+}
+
+void CreateManyCubes(Mesh* myMesh, Material* myMaterial)
+{
+	srand(time(NULL));
+
+	int cubeCount = 10;
+
+	int maxLoop = 50;
+	for (int i = 0; i < cubeCount; i++)
+	{
+		bool next = true;
+		float randomX, randomY, randomZ;
+		maxLoop = 50;
+		do
+		{
+			next = true;
+			//get a random x and y
+			randomX = -13.8f + (static_cast <float> (rand() / (static_cast <float> (RAND_MAX / (13.8f - (-13.8f))))));
+			randomY = (static_cast <float> (rand() / (static_cast <float> (RAND_MAX / (9.7f - (-9.7f))))));
+			randomZ = 5.f + (static_cast <float> (rand() / (static_cast <float> (RAND_MAX / (20.f - (5.f))))));
+
+			//see if this position will intersect with another cube | if so, remake the position
+			for (int j = 0; j < i; j++)
+			{
+				if (abs(gameEntities[j]->position.x - randomX) < 2.f && abs(gameEntities[j]->position.y - randomY) < 2.f)
+				{
+					next = false;
+					maxLoop--;
+					if (maxLoop <= 0)
+					{
+						next = true;
+					}
+				}
+			}
+		} while (!next);
+
+		//create the entity, also giving it a random color
+		GameEntity* myGameEntity = new GameEntity(
+			myMesh,
+			myMaterial,
+			glm::vec3(randomX, randomY, randomZ),
+			glm::vec3(0.f, 0.f, 0.f),
+			glm::vec3(1.f, 1.f, 1.f),
+			glm::vec3(0.8f, 0.8f, 0.8f),
+			true,
+			glm::vec3(1.f, 1.f, 1.f),
+			0
+		);
+		gameEntities.push_back(myGameEntity);
+	}
+}
+
+void CreateBezierExample(Mesh* bMesh, Material* bMat)
+{
+	int pointCount = 100;
+	BezierCurve* bezierCurve = new BezierCurve(glm::vec2(20, 10), glm::vec2(10, 10), glm::vec2(5, 20), glm::vec2(25, 20));
+
+	float interval = (float)(1.f / pointCount);
+	for (int i = 0; i < pointCount; i++)
+	{
+		float t = interval * i;
+		glm::vec2 pos = bezierCurve->GetPoint(t);
+		GameEntity* myGameEntity = new GameEntity(
+			bMesh,
+			bMat,
+			glm::vec3(pos.x, pos.y, 5),
+			glm::vec3(0.f, 0.f, 0.f),
+			glm::vec3(0.01f, 0.01f, 0.01f),
+			glm::vec3(0.8f, 0.8f, 0.8f),
+			false,
+			glm::vec3(1.f, 1.f, 1.f),
+			0
+		);
+		gameEntities.push_back(myGameEntity);
+	}
 }
