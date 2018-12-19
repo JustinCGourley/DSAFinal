@@ -134,12 +134,12 @@ int main()
 
             //create vS and attach to shader program
             Shader *vs = new Shader();
-            vs->InitFromFile("assets/shaders/vertexShader.glsl", GL_VERTEX_SHADER);
+            vs->InitFromFile("../assets/shaders/vertexShader.glsl", GL_VERTEX_SHADER);
             glAttachShader(shaderProgram, vs->GetShaderLoc());
 
             //create FS and attach to shader program
             Shader *fs = new Shader();
-            fs->InitFromFile("assets/shaders/fragmentShader.glsl", GL_FRAGMENT_SHADER);
+            fs->InitFromFile("../assets/shaders/fragmentShader.glsl", GL_FRAGMENT_SHADER);
             glAttachShader(shaderProgram, fs->GetShaderLoc());
 
             //link everything that's attached together
@@ -318,7 +318,7 @@ int main()
 			false,
 			glm::vec3(100.f, 1.f, 100.f),
 			1,
-			"ground"
+			"Floor"
 		);
 
 		gameEntities.push_back(floor);
@@ -472,7 +472,7 @@ void CreateManyCubes(Mesh* myMesh, Material* myMaterial)
 {
 	srand(time(NULL));
 
-	int cubeCount = 10;
+	int cubeCount = 5;
 
 	int maxLoop = 50;
 	for (int i = 0; i < cubeCount; i++)
@@ -516,7 +516,7 @@ void CreateManyCubes(Mesh* myMesh, Material* myMaterial)
 			true,
 			glm::vec3(1.f, 1.f, 1.f),
 			1,
-			"cube"
+			"Cube"
 		);
 		gameEntities.push_back(myGameEntity);
 	}

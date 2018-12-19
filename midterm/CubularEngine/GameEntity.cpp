@@ -95,37 +95,41 @@ void GameEntity::CheckCollisions(std::vector<GameEntity*> entities, int num)
 					this->position.z - this->collider.z <= (entities[i]->position.z + entities[i]->collider.z) && this->position.z - this->collider.z >= (entities[i]->position.z - entities[i]->collider.z)))
 			{
 				
+				if (entities[i]->tag == std::string("Floor")) {
+					entities[i]->velocity = glm::vec3(0.f, 0.f, 0.f);
+					entities[i]->weight = this->weight;
+				}
 
 				//glm::vec3 positionDiff = (entities[i]->position - this->position) - (entities[i]->position - (this->position + this->velocity));
-				glm::vec3 positionDiff = (entities[i]->position - (this->position + this->velocity));
+				glm::vec3 positionDiff = ((entities[i]->position + entities[i]->velocity) - (this->position + this->velocity));
 				
+				if (entities[i]->tag != std::string("Floor")) {
+					if (positionDiff.x != 0 && abs(positionDiff.x) > abs(positionDiff.y) && abs(positionDiff.x) > abs(positionDiff.z))
+					{
+						if (positionDiff.x < 0 && this->velocity.x < 0)
+						{
+							float overshot = (this->position.x - this->collider.x) - (entities[i]->position.x + entities[i]->collider.x);
+							this->position.x -= overshot;
 
-				if (positionDiff.x != 0)
-				{
-					if (positionDiff.x < 0 && this->velocity.x < 0)
-					{
-						float overshot = (this->position.x - this->collider.x) - (entities[i]->position.x + entities[i]->collider.x);
-						this->position.x -= overshot;
-						
-						float thisVel = UpdateLinearMomentum(this->velocity.x, this->weight, entities[i]->velocity.x, entities[i]->weight);
-						float entityVel = UpdateLinearMomentum(entities[i]->velocity.x, entities[i]->weight, this->velocity.x, this->weight);
-						this->velocity.x = thisVel;
-						entities[i]->velocity.x = entityVel;
-					}
-					else if (positionDiff.x > 0 && this->velocity.x > 0)
-					{
-						float overshot = (this->position.x + this->collider.x) - (entities[i]->position.x - entities[i]->collider.x);
-						this->position.x -= overshot;
-						
-						float thisVel = UpdateLinearMomentum(this->velocity.x, this->weight, entities[i]->velocity.x, entities[i]->weight);
-						float entityVel = UpdateLinearMomentum(entities[i]->velocity.x, entities[i]->weight, this->velocity.x, this->weight);
-						this->velocity.x = thisVel;
-						entities[i]->velocity.x = entityVel;
+							float thisVel = UpdateLinearMomentum(this->velocity.x, this->weight, entities[i]->velocity.x, entities[i]->weight);
+							float entityVel = UpdateLinearMomentum(entities[i]->velocity.x, entities[i]->weight, this->velocity.x, this->weight);
+							this->velocity.x = thisVel;
+							entities[i]->velocity.x = entityVel;
+						}
+						else if (positionDiff.x > 0 && this->velocity.x > 0)
+						{
+							float overshot = (this->position.x + this->collider.x) - (entities[i]->position.x - entities[i]->collider.x);
+							this->position.x -= overshot;
+
+							float thisVel = UpdateLinearMomentum(this->velocity.x, this->weight, entities[i]->velocity.x, entities[i]->weight);
+							float entityVel = UpdateLinearMomentum(entities[i]->velocity.x, entities[i]->weight, this->velocity.x, this->weight);
+							this->velocity.x = thisVel;
+							entities[i]->velocity.x = entityVel;
+						}
 					}
 				}
 
-
-				if (positionDiff.y != 0)
+				if ((positionDiff.y != 0 && abs(positionDiff.y) > abs(positionDiff.x) && abs(positionDiff.y) > abs(positionDiff.z)) || entities[i]->tag == std::string("Floor"))
 				{
 					if (positionDiff.y < 0 && this->velocity.y < 0)
 					{
@@ -155,7 +159,7 @@ void GameEntity::CheckCollisions(std::vector<GameEntity*> entities, int num)
 					}
 				}
 
-				if (positionDiff.z != 0)
+				if (positionDiff.z != 0 && abs(positionDiff.z) > abs(positionDiff.x) && abs(positionDiff.z) > abs(positionDiff.x))
 				{
 					if (positionDiff.z < 0 && this->velocity.z < 0)
 					{
@@ -186,8 +190,8 @@ void GameEntity::CheckCollisions(std::vector<GameEntity*> entities, int num)
 float GameEntity::UpdateLinearMomentum(float vel1, float mass1, float vel2, float mass2) {
 	float numerator = (mass1 - mass2)*vel1 + (2 * mass2*vel2);
 	float denominator = mass1 + mass2;
-	std::cout << "Numerator: " << numerator<< std::endl;
-	std::cout << "Denominator: " << denominator << std::endl;
+	//std::cout << "Numerator: " << numerator<< std::endl;
+	//std::cout << "Denominator: " << denominator << std::endl;
 	return numerator / denominator;
 }
 
