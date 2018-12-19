@@ -95,12 +95,12 @@ int main()
 
             //create vS and attach to shader program
             Shader *vs = new Shader();
-            vs->InitFromFile("assets/shaders/vertexShader.glsl", GL_VERTEX_SHADER);
+            vs->InitFromFile("../assets/shaders/vertexShader.glsl", GL_VERTEX_SHADER);
             glAttachShader(shaderProgram, vs->GetShaderLoc());
 
             //create FS and attach to shader program
             Shader *fs = new Shader();
-            fs->InitFromFile("assets/shaders/fragmentShader.glsl", GL_FRAGMENT_SHADER);
+            fs->InitFromFile("../assets/shaders/fragmentShader.glsl", GL_FRAGMENT_SHADER);
             glAttachShader(shaderProgram, fs->GetShaderLoc());
 
             //link everything that's attached together
@@ -203,7 +203,8 @@ int main()
 			glm::vec3(0.2f, 0.2f, 0.2f),
 			false,
 			glm::vec3(100.f, 1.f, 100.f),
-			0
+			1,
+			std::string("ground")
 		);
 
 		gameEntities.push_back(floor);
@@ -251,6 +252,9 @@ int main()
 			{
 				gameEntities[i]->Update(gameEntities, i);
 			}
+
+			gameEntities[0]->ApplyForce(glm::vec3(0.001f, 0.0f, 0.0f));
+
 			myCamera->Update();
 
 
@@ -310,21 +314,24 @@ void CreateManyCubes(Mesh* myMesh, Material* myMaterial)
 {
 	srand(time(NULL));
 
-	int cubeCount = 10;
+	int cubeCount = 5;
 
 	int maxLoop = 50;
 	for (int i = 0; i < cubeCount; i++)
 	{
 		bool next = true;
 		float randomX, randomY, randomZ;
+
 		maxLoop = 50;
 		do
 		{
 			next = true;
 			//get a random x and y
 			randomX = -13.8f + (static_cast <float> (rand() / (static_cast <float> (RAND_MAX / (13.8f - (-13.8f))))));
-			randomY = (static_cast <float> (rand() / (static_cast <float> (RAND_MAX / (9.7f - (-9.7f))))));
-			randomZ = 5.f + (static_cast <float> (rand() / (static_cast <float> (RAND_MAX / (20.f - (5.f))))));
+			//randomY = (static_cast <float> (rand() / (static_cast <float> (RAND_MAX / (9.7f - (-9.7f))))));
+			randomY = 0;
+			//randomZ = 5.f + (static_cast <float> (rand() / (static_cast <float> (RAND_MAX / (20.f - (5.f))))));
+			randomZ = 0;
 
 			//see if this position will intersect with another cube | if so, remake the position
 			for (int j = 0; j < i; j++)
@@ -351,7 +358,8 @@ void CreateManyCubes(Mesh* myMesh, Material* myMaterial)
 			glm::vec3(0.8f, 0.8f, 0.8f),
 			true,
 			glm::vec3(1.f, 1.f, 1.f),
-			0
+			1,
+			std::string("cube")
 		);
 		gameEntities.push_back(myGameEntity);
 	}
@@ -376,7 +384,8 @@ void CreateBezierExample(Mesh* bMesh, Material* bMat)
 			glm::vec3(0.8f, 0.8f, 0.8f),
 			false,
 			glm::vec3(1.f, 1.f, 1.f),
-			0
+			0,
+			std::string("curve")
 		);
 		gameEntities.push_back(myGameEntity);
 	}

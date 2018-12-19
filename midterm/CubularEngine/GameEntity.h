@@ -21,6 +21,7 @@ private:
 
 	void UpdatePhysics();
 	void CheckCollisions(std::vector<GameEntity*>, int num);
+	float UpdateLinearMomentum(float vel1, float mass1, float vel2, float mass2);
 	void UpdatePosition();
 
 
@@ -37,7 +38,8 @@ public:
 		glm::vec3 color,
 		bool applyPhysics,
 		glm::vec3 collider,
-		float weight
+		float weight,
+		std::string tag
     );
 
 	glm::vec3 position;
@@ -47,6 +49,7 @@ public:
 	bool applyPhysics;
 	bool applyGravity;
 	float weight;
+	std::string tag;
     /// <summary>
     /// Destruction
     /// </summary>
