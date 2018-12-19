@@ -619,7 +619,9 @@ void UpdateScaleExample(GameEntity *gameObj)
 	}
 
 	gameObj->scale = scaleSet;
-	gameObj->eulerAngles.y += 0.001f;
+	gameObj->eulerAngles.y += 0.009f;
+	gameObj->eulerAngles.x += 0.006f;
+	gameObj->eulerAngles.z += 0.003f;
 }
 
 void SetupLERPExample(Mesh *bMesh, Material *bMat)
