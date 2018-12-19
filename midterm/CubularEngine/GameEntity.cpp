@@ -10,7 +10,8 @@ GameEntity::GameEntity(
 	glm::vec3 color,
 	bool applyPhysics,
 	glm::vec3 collider,
-	float weight)
+	float weight,
+	std::string tag)
 {
     this->mesh = mesh;
     this->material = material;
@@ -25,6 +26,7 @@ GameEntity::GameEntity(
 	this->applyGravity = true;
 	this->weight = weight;
 	this->velocity = glm::vec3(0, 0, 0);
+	this->tag = tag;
 }
 
 GameEntity::~GameEntity()
@@ -39,6 +41,9 @@ void GameEntity::Update(std::vector<GameEntity*> entities, int num)
 		this->UpdatePhysics();
 		this->CheckCollisions(entities, num);
 		this->UpdatePosition();
+	}
+	else {
+		this->velocity = glm::vec3(0, 0, 0);
 	}
 
 	worldMatrix = glm::translate(glm::identity<glm::mat4>(),
@@ -101,13 +106,21 @@ void GameEntity::CheckCollisions(std::vector<GameEntity*> entities, int num)
 					{
 						float overshot = (this->position.x - this->collider.x) - (entities[i]->position.x + entities[i]->collider.x);
 						this->position.x -= overshot;
-						this->velocity.x = 0;
+						
+						float thisVel = UpdateLinearMomentum(this->velocity.x, this->weight, entities[i]->velocity.x, entities[i]->weight);
+						float entityVel = UpdateLinearMomentum(entities[i]->velocity.x, entities[i]->weight, this->velocity.x, this->weight);
+						this->velocity.x = thisVel;
+						entities[i]->velocity.x = entityVel;
 					}
 					else if (positionDiff.x > 0 && this->velocity.x > 0)
 					{
 						float overshot = (this->position.x + this->collider.x) - (entities[i]->position.x - entities[i]->collider.x);
 						this->position.x -= overshot;
-						this->velocity.x = 0;
+						
+						float thisVel = UpdateLinearMomentum(this->velocity.x, this->weight, entities[i]->velocity.x, entities[i]->weight);
+						float entityVel = UpdateLinearMomentum(entities[i]->velocity.x, entities[i]->weight, this->velocity.x, this->weight);
+						this->velocity.x = thisVel;
+						entities[i]->velocity.x = entityVel;
 					}
 				}
 
@@ -118,13 +131,27 @@ void GameEntity::CheckCollisions(std::vector<GameEntity*> entities, int num)
 					{
 						float overshot = (this->position.y - this->collider.y) - (entities[i]->position.y + entities[i]->collider.y);
 						this->position.y -= overshot;
-						this->velocity.y = 0;
+						
+						//mass dependent
+						float thisVel = UpdateLinearMomentum(this->velocity.y, this->weight, entities[i]->velocity.y, entities[i]->weight);
+						float entityVel = UpdateLinearMomentum(entities[i]->velocity.y, entities[i]->weight, this->velocity.y, this->weight);
+						this->velocity.y = thisVel;
+						entities[i]->velocity.y = entityVel;
+
+						//mass independent
+						/*float vel = this->velocity.y;
+						this->velocity.y = entities[i]->velocity.y;
+						entities[i]->velocity.y = vel;*/
 					}
 					else if (positionDiff.y > 0 && this->velocity.y > 0)
 					{
 						float overshot = (this->position.y + this->collider.y) - (entities[i]->position.y - entities[i]->collider.y);
 						this->position.y -= overshot;
-						this->velocity.y = 0;
+						
+						float thisVel = UpdateLinearMomentum(this->velocity.y, this->weight, entities[i]->velocity.y, entities[i]->weight);
+						float entityVel = UpdateLinearMomentum(entities[i]->velocity.y, entities[i]->weight, this->velocity.y, this->weight);
+						this->velocity.y = thisVel;
+						entities[i]->velocity.y = entityVel;
 					}
 				}
 
@@ -134,18 +161,34 @@ void GameEntity::CheckCollisions(std::vector<GameEntity*> entities, int num)
 					{
 						float overshot = (this->position.z + this->collider.z) - (entities[i]->position.z - entities[i]->collider.z);
 						this->position.z -= overshot;
-						this->velocity.z = 0;
+
+						float thisVel = UpdateLinearMomentum(this->velocity.z, this->weight, entities[i]->velocity.z, entities[i]->weight);
+						float entityVel = UpdateLinearMomentum(entities[i]->velocity.z, entities[i]->weight, this->velocity.z, this->weight);
+						this->velocity.z = thisVel;
+						entities[i]->velocity.z = entityVel;
 					}
 					else if (positionDiff.z > 0 && this->velocity.z > 0)
 					{
 						float overshot = (this->position.z - this->collider.z) - (entities[i]->position.z + entities[i]->collider.z);
 						this->position.z -= overshot;
-						this->velocity.z = 0;
+						
+						float thisVel = UpdateLinearMomentum(this->velocity.z, this->weight, entities[i]->velocity.z, entities[i]->weight);
+						float entityVel = UpdateLinearMomentum(entities[i]->velocity.z, entities[i]->weight, this->velocity.z, this->weight);
+						this->velocity.z = thisVel;
+						entities[i]->velocity.z = entityVel;
 					}
 				}
 			}
 		}
 	}
+}
+
+float GameEntity::UpdateLinearMomentum(float vel1, float mass1, float vel2, float mass2) {
+	float numerator = (mass1 - mass2)*vel1 + (2 * mass2*vel2);
+	float denominator = mass1 + mass2;
+	std::cout << "Numerator: " << numerator<< std::endl;
+	std::cout << "Denominator: " << denominator << std::endl;
+	return numerator / denominator;
 }
 
 void GameEntity::UpdatePosition()
