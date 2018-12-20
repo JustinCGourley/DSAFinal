@@ -39,7 +39,8 @@ public:
 		bool applyPhysics,
 		glm::vec3 collider,
 		float weight,
-		std::string tag
+		std::string tag,
+		glm::vec3 shear
     );
 
 	glm::vec3 position;
@@ -50,6 +51,7 @@ public:
 	bool applyGravity;
 	float weight;
 	std::string tag;
+	glm::vec3 shear;
     /// <summary>
     /// Destruction
     /// </summary>

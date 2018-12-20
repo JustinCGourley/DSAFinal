@@ -5,6 +5,8 @@
 #include "glm/gtc/quaternion.hpp"
 #include "glm/gtx/quaternion.hpp"
 
+#include "glm/gtx/transform2.hpp"
+
 GameEntity::GameEntity(
 	Mesh * mesh, 
     Material * material,
@@ -15,7 +17,8 @@ GameEntity::GameEntity(
 	bool applyPhysics,
 	glm::vec3 collider,
 	float weight,
-	std::string tag)
+	std::string tag,
+	glm::vec3 shear)
 {
     this->mesh = mesh;
     this->material = material;
@@ -31,6 +34,8 @@ GameEntity::GameEntity(
 	this->weight = weight;
 	this->velocity = glm::vec3(0, 0, 0);
 	this->tag = tag;
+
+	this->shear = shear;
 }
 
 GameEntity::~GameEntity()
@@ -52,6 +57,10 @@ void GameEntity::Update(std::vector<GameEntity*> entities, int num, irrklang::IS
 
 	worldMatrix = glm::translate(glm::identity<glm::mat4>(),
 		this->position);
+
+	worldMatrix = glm::shearX3D(worldMatrix, this->shear.y, this->shear.z);
+	worldMatrix = glm::shearY3D(worldMatrix, this->shear.x, this->shear.z);
+	worldMatrix = glm::shearZ3D(worldMatrix, this->shear.x, this->shear.y);
 
 	/*worldMatrix = glm::rotate(worldMatrix,
 		this->eulerAngles.y,

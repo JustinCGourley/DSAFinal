@@ -59,7 +59,7 @@ int main()
 
 	irrklang::ISoundEngine* engine = irrklang::createIrrKlangDevice();
 
-	engine->setSoundVolume(0.25f);
+	engine->setSoundVolume(0.1f);
 
 	//engine->play2D("../libraries/irrKlang-1.5.0/media/explosion.wav", false);
 
@@ -243,7 +243,8 @@ int main()
 			false,
 			glm::vec3(0.f, 0.f, 0.f),
 			0,
-			"Object"
+			"Object",
+			glm::vec3(0.f, 0.f, 0.f)
 		);
 
 		gameEntities.push_back(bezierCube);
@@ -259,7 +260,8 @@ int main()
 			false,
 			glm::vec3(0.f, 0.f, 0.f),
 			0,
-			"Object"
+			"Object",
+			glm::vec3(0.f, 0.f, 0.f)
 		);
 
 		gameEntities.push_back(scaleExample);
@@ -279,7 +281,8 @@ int main()
 			false,
 			glm::vec3(0.f, 0.f, 0.f),
 			0,
-			"Object"
+			"Object",
+			glm::vec3(0.f, 0.f, 0.f)
 		);
 
 		gameEntities.push_back(lerpExample);
@@ -299,7 +302,8 @@ int main()
 			false,
 			glm::vec3(0.f, 0.f, 0.f),
 			0,
-			"Object"
+			"Object",
+			glm::vec3(0.f, 0.f, 0.f)
 		);
 
 		gameEntities.push_back(slerpExample);
@@ -319,7 +323,8 @@ int main()
 			false,
 			glm::vec3(100.f, 1.f, 100.f),
 			1,
-			"Floor"
+			"Floor",
+			glm::vec3(0.f, 0.f, 0.f)
 		);
 
 		gameEntities.push_back(floor);
@@ -520,7 +525,8 @@ void CreateManyCubes(Mesh* myMesh, Material* myMaterial)
 			true,
 			glm::vec3(1.f, 1.f, 1.f),
 			1,
-			"Cube"
+			"Cube",
+			glm::vec3(0.f, 0.f, 0.f)
 		);
 		gameEntities.push_back(myGameEntity);
 	}
@@ -545,7 +551,8 @@ void CreateBezierExample(Mesh* bMesh, Material* bMat, BezierCurve* bezierCurve)
 			false,
 			glm::vec3(0.f, 0.f, 0.f),
 			0,
-			"Object"
+			"Object",
+			glm::vec3(0.f, 0.f, 0.f)
 		);
 		gameEntities.push_back(myGameEntity);
 	}
@@ -561,7 +568,8 @@ void CreateBezierExample(Mesh* bMesh, Material* bMat, BezierCurve* bezierCurve)
 		false,
 		glm::vec3(0.f, 0.f, 0.f),
 		0,
-		"Object"
+		"Object",
+		glm::vec3(0.f, 0.f, 0.f)
 	);
 
 	pos = bezierCurve->GetPoint(1);
@@ -575,7 +583,8 @@ void CreateBezierExample(Mesh* bMesh, Material* bMat, BezierCurve* bezierCurve)
 		false,
 		glm::vec3(0.f, 0.f, 0.f),
 		0,
-		"Object"
+		"Object",
+		glm::vec3(0.f, 0.f, 0.f)
 	);
 
 	gameEntities.push_back(start);
@@ -647,7 +656,8 @@ void SetupLERPExample(Mesh *bMesh, Material *bMat)
 			false,
 			glm::vec3(0.f, 0.f, 0.f),
 			0,
-			"Object"
+			"Object",
+			glm::vec3(0.f, 0.f, 0.f)
 		);
 
 		gameEntities.push_back(obj);
@@ -664,7 +674,8 @@ void SetupLERPExample(Mesh *bMesh, Material *bMat)
 		false,
 		glm::vec3(0.f, 0.f, 0.f),
 		0,
-		"Object"
+		"Object",
+		glm::vec3(0.f, 0.f, 0.f)
 	);
 	GameEntity* lerpEndObj = new GameEntity(
 		bMesh,
@@ -676,7 +687,8 @@ void SetupLERPExample(Mesh *bMesh, Material *bMat)
 		false,
 		glm::vec3(0.f, 0.f, 0.f),
 		0,
-		"Object"
+		"Object",
+		glm::vec3(0.f, 0.f, 0.f)
 	);
 
 	gameEntities.push_back(lerpStartObj);
@@ -703,7 +715,8 @@ void SetupSLERPExample(Mesh *bMesh, Material *bMat)
 			false,
 			glm::vec3(0.f, 0.f, 0.f),
 			0,
-			"Object"
+			"Object",
+			glm::vec3(0.f, 0.f, 0.f)
 		);
 
 		gameEntities.push_back(obj);
@@ -720,7 +733,8 @@ void SetupSLERPExample(Mesh *bMesh, Material *bMat)
 		false,
 		glm::vec3(0.f, 0.f, 0.f),
 		0,
-		"Object"
+		"Object",
+		glm::vec3(0.f, 0.f, 0.f)
 	);
 	GameEntity* slerpEndObj = new GameEntity(
 		bMesh,
@@ -732,7 +746,8 @@ void SetupSLERPExample(Mesh *bMesh, Material *bMat)
 		false,
 		glm::vec3(0.f, 0.f, 0.f),
 		0,
-		"Object"
+		"Object",
+		glm::vec3(0.f, 0.f, 0.f)
 	);
 
 	gameEntities.push_back(slerpStartObj);
