@@ -42,6 +42,7 @@ GameEntity::~GameEntity()
 {
 }
 
+//Handles the physics of onjects in the world
 void GameEntity::Update(std::vector<GameEntity*> entities, int num, irrklang::ISoundEngine* engine)
 {
 
@@ -58,6 +59,7 @@ void GameEntity::Update(std::vector<GameEntity*> entities, int num, irrklang::IS
 	worldMatrix = glm::translate(glm::identity<glm::mat4>(),
 		this->position);
 
+	//Controls shear amount
 	worldMatrix = glm::shearX3D(worldMatrix, this->shear.y, this->shear.z);
 	worldMatrix = glm::shearY3D(worldMatrix, this->shear.x, this->shear.z);
 	worldMatrix = glm::shearZ3D(worldMatrix, this->shear.x, this->shear.y);
@@ -98,12 +100,15 @@ void GameEntity::UpdatePhysics()
 	//check collisions
 }
 
+
+//Checks for collisions with objects in the given vector
 void GameEntity::CheckCollisions(std::vector<GameEntity*> entities, int num, irrklang::ISoundEngine* engine)
 {
 	for (int i = 0; i < entities.size(); i++)
 	{
 		if (entities[i] != this)
 		{
+			//AABB collisions
 			if ((this->position.x + this->collider.x <= (entities[i]->position.x + entities[i]->collider.x) && this->position.x + this->collider.x >= (entities[i]->position.x - entities[i]->collider.x) ||
 				this->position.x - this->collider.x <= (entities[i]->position.x + entities[i]->collider.x) && this->position.x - this->collider.x >= (entities[i]->position.x - entities[i]->collider.x))
 				&&
@@ -119,17 +124,20 @@ void GameEntity::CheckCollisions(std::vector<GameEntity*> entities, int num, irr
 					entities[i]->weight = this->weight;
 				}
 
+				//If the gravity exapmle play a sound
 				if (this->tag == std::string("SoundCube")) {
 					engine->play2D("../libraries/irrKlang-1.5.0/media/bounce.wav", false);
 				}
 
 				//glm::vec3 positionDiff = (entities[i]->position - this->position) - (entities[i]->position - (this->position + this->velocity));
+				//Checks for the future positions of the objects
 				glm::vec3 positionDiff = ((entities[i]->position + entities[i]->velocity) - (this->position + this->velocity));
 
 				if (entities[i]->tag == std::string("Wall")) {
 					entities[i]->velocity = this->velocity * -1.0f;
 				}
 				
+				//Detects collision on the x-axis
 				if (entities[i]->tag != std::string("Floor")) {
 					//if (positionDiff.x != 0 && abs(positionDiff.x) > abs(positionDiff.y) && abs(positionDiff.x) > abs(positionDiff.z))
 					if (positionDiff.x != 0)
@@ -167,6 +175,7 @@ void GameEntity::CheckCollisions(std::vector<GameEntity*> entities, int num, irr
 					}
 				}
 
+				//Detects collision on the z-axis
 				if (entities[i]->tag != std::string("Floor")) {
 					//if (positionDiff.z != 0 && abs(positionDiff.z) > abs(positionDiff.x) && abs(positionDiff.z) > abs(positionDiff.x))
 					if (positionDiff.z != 0)
@@ -204,6 +213,7 @@ void GameEntity::CheckCollisions(std::vector<GameEntity*> entities, int num, irr
 					}
 				}
 
+				//Detects collision on the x-axis
 				//if ((positionDiff.y != 0 && abs(positionDiff.y) > abs(positionDiff.x) && abs(positionDiff.y) > abs(positionDiff.z)) || entities[i]->tag == std::string("Floor"))
 				if ((positionDiff.y != 0) || entities[i]->tag == std::string("Floor"))
 				{
@@ -239,6 +249,7 @@ void GameEntity::CheckCollisions(std::vector<GameEntity*> entities, int num, irr
 	}
 }
 
+//Linear momentum equation returns the new velocity
 float GameEntity::UpdateLinearMomentum(float vel1, float mass1, float vel2, float mass2) {
 	float numerator = (mass1 - mass2)*vel1 + (2 * mass2*vel2);
 	float denominator = mass1 + mass2;

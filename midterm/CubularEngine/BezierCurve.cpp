@@ -1,7 +1,7 @@
 #include "BezierCurve.h"
 
 
-
+//constructor, takes in start and end points, as well as control points for both
 BezierCurve::BezierCurve(glm::vec2 start, glm::vec2 end, glm::vec2 controlPointStart, glm::vec2 controlPointEnd)
 {
 
@@ -12,6 +12,7 @@ BezierCurve::BezierCurve(glm::vec2 start, glm::vec2 end, glm::vec2 controlPointS
 
 }
 
+//get a point back based on a given time (t)
 float BezierCurve::CalculatePoint(float p1, float p2, float t)
 {
 	float diff = p2 - p1;
@@ -19,6 +20,7 @@ float BezierCurve::CalculatePoint(float p1, float p2, float t)
 	return p1 + (diff * t);
 }
 
+//get a point on the bezier curve based on a given time
 glm::vec2 BezierCurve::GetPoint(float t)
 {
 	//outer values

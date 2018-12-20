@@ -40,13 +40,12 @@ Camera::~Camera()
 {
 }
 
-//TODO - incorporate deltaTime
-//TODO - maybe separate this function should instead call two private functions
-//       (something like UpdateInput() and UpdateMatrices())
+//Update the camera
 void Camera::Update()
 {
-	if (controllable)
+	if (controllable)//if controllable activate all the controls for the camera
 	{
+		//update played based movement for the camera
 		if (Input::GetInstance()->IsKeyDown(GLFW_KEY_A))
 		{
 			position -= right * speed;
@@ -73,7 +72,7 @@ void Camera::Update()
 		}
 
 
-
+		//mouse movement setting pitch and yaw
 		if (start)
 		{
 			double *getX = &lastX;
@@ -101,6 +100,7 @@ void Camera::Update()
 
 		yaw += xDistance;
 
+		//setting forward vec based on pitch and yaw
 		forward.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
 		forward.y = sin(glm::radians(pitch));
 		forward.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));

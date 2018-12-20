@@ -204,7 +204,7 @@ int main()
 		std::cout << "In the gravity example an explosion noise is played whenever a collision is detected" << std::endl;
 
 
-		 
+		 //setting the input mode to remove the cursor from the screen, and lock the user into that window (use alt-tab to get out)
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
         //init the mesh (a cube)
@@ -623,6 +623,7 @@ void CreateBezierExample(Mesh* bMesh, Material* bMat, BezierCurve* bezierCurve)
 	int pointCount = 100;
 
 	float interval = (float)(1.f / pointCount);
+	//create line of objects to show the curve
 	for (int i = 0; i < pointCount; i++)
 	{
 		float t = interval * i;
@@ -719,6 +720,7 @@ void UpdateScaleExample(GameEntity *gameObj)
 		scaleSet.z = scaleAmount;
 	}
 
+	//update to new scale and rotation
 	gameObj->scale = scaleSet;
 	gameObj->eulerAngles.y += 0.009f;
 	gameObj->eulerAngles.x += 0.006f;
@@ -759,6 +761,7 @@ void SetupLERPExample(Mesh *bMesh, Material *bMat)
 	int pointCount = 100;
 	float step = 1.f / pointCount;
 
+	//create line of objects to show line of LERP
 	for (int i = 0; i < pointCount; i++)
 	{
 		float t = step * i;
@@ -925,6 +928,7 @@ void CreatePhysicsExample1(Mesh *mesh, Material *mat)
 		glm::vec3(0.f, 0.f, 0.f)
 	);
 
+	//add 4 walls
 	octreeEntities.push_back(wall1);
 	octreeEntities.push_back(wall2);
 	octreeEntities.push_back(wall3);
@@ -964,7 +968,7 @@ void CreatePhysicsExample1(Mesh *mesh, Material *mat)
 	}
 }
 
-//QuadTree
+//QuadTree creates as set of vectors each based on the regions generated
 void QuadTree(std::vector<GameEntity*> quadify, GameEntity* floor, glm::vec3 center, irrklang::ISoundEngine* sound) {
 
 	std::vector<GameEntity*> topRight;
@@ -1000,6 +1004,8 @@ void QuadTree(std::vector<GameEntity*> quadify, GameEntity* floor, glm::vec3 cen
 		}
 	}
 
+
+	//Updates the individual vectors for the regions
 	for (int i = 0; i < topRight.size(); i++)
 	{
 		topRight[i]->Update(topRight, i, sound);
@@ -1033,7 +1039,7 @@ void UpdateGravityExample(GameEntity* gameObj)
 // ========================================================== Update input based on cameras
 void CheckUpdateCameras()
 {
-	if (Input::GetInstance()->IsKeyDown(GLFW_KEY_RIGHT) && !cameraSwap)
+	if (Input::GetInstance()->IsKeyDown(GLFW_KEY_RIGHT) && !cameraSwap)//right key pressed
 	{
 		curCamera++;
 		if (curCamera >= cameras.size())
@@ -1042,7 +1048,7 @@ void CheckUpdateCameras()
 		}
 		cameraSwap = true;
 	}
-	else if (Input::GetInstance()->IsKeyDown(GLFW_KEY_LEFT) && !cameraSwap)
+	else if (Input::GetInstance()->IsKeyDown(GLFW_KEY_LEFT) && !cameraSwap)//left key pressed
 	{
 		curCamera--;
 		if (curCamera < 0)
@@ -1052,7 +1058,7 @@ void CheckUpdateCameras()
 		cameraSwap = true;
 	}
 
-	if (Input::GetInstance()->IsKeyDown(GLFW_KEY_LEFT) == false && Input::GetInstance()->IsKeyDown(GLFW_KEY_RIGHT) == false && cameraSwap)
+	if (Input::GetInstance()->IsKeyDown(GLFW_KEY_LEFT) == false && Input::GetInstance()->IsKeyDown(GLFW_KEY_RIGHT) == false && cameraSwap)//no keys
 	{
 		cameraSwap = false;
 	}

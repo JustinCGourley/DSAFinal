@@ -14,12 +14,13 @@ Interpolate::Interpolate()
 {
 }
 
-
+//Simple LERP function (takes a start, end, and time, and sends back given position based on time)
 glm::vec3 Interpolate::LERP(glm::vec3 start, glm::vec3 end, float time)
 {
 	return (start + time * (end - start));
 }
 
+//SLERP function, interpolated between start and end, giving back a vec3 based on given time
 glm::vec3 Interpolate::SLERP(glm::vec3 start, glm::vec3 end, float time)
 {
 
