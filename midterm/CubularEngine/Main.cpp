@@ -14,6 +14,7 @@ void CreateManyCubes(Mesh*, Material*);
 void CreateBezierExample(Mesh*, Material*, BezierCurve*);
 void UpdateBezierExample(BezierCurve *, GameEntity *);
 void UpdateScaleExample(GameEntity *);
+void UpdateSheerExample(GameEntity *);
 void UpdateLERPExample(GameEntity *);
 void UpdateSLERPExample(GameEntity *);
 void SetupLERPExample(Mesh *, Material *);
@@ -21,6 +22,7 @@ void SetupSLERPExample(Mesh *, Material *);
 Camera* CreateCamera(glm::vec3 pos, glm::vec3 forward, glm::vec3 up, int width, int height, GLFWwindow *window, bool controllable);
 void CreatePhysicsExample1(Mesh *mesh, Material *mat);
 void CheckUpdateCameras();
+void UpdateGravityExample(GameEntity* gameObj);
 void QuadTree(std::vector<GameEntity*> quadify, GameEntity* floor, glm::vec3 center, irrklang::ISoundEngine* sound);
 
 std::vector<GameEntity*> gameEntities;
@@ -36,6 +38,10 @@ bool bezierDirForward = true;
 //scaling example
 int scalingDir = 0;
 float scaleAmount = 1.f;
+
+//shear example
+int shearDir = 0;
+float shearAmount = 0.f;
 
 //interpolation declaration
 Interpolate interpolate;
@@ -270,6 +276,23 @@ int main()
 
 		staticEntities.push_back(scaleExample);
 
+		//============ create shearing example=============================
+		GameEntity* shearingExample = new GameEntity(
+			bMesh,
+			bMat,
+			glm::vec3(90, 5, 5),
+			glm::vec3(0.f, 0.f, 0.f),
+			glm::vec3(1.f, 1.f, 1.f),
+			glm::vec3(0.8f, 0.8f, 0.8f),
+			false,
+			glm::vec3(0.f, 0.f, 0.f),
+			0,
+			"Object",
+			glm::vec3(0.f, 0.f, 0.f)
+		);
+
+		staticEntities.push_back(shearingExample);
+
 		//================== create lerp example ========================
 
 		SetupLERPExample(bMesh, bMat);
@@ -341,6 +364,22 @@ int main()
 
 		Input::GetInstance()->Init(window);
 
+		//============================================= create gravity example =================================
+		GameEntity* gravityExample = new GameEntity(
+			bMesh,
+			bMat,
+			glm::vec3(40.f, 50.f, -70.f),
+			glm::vec3(0.f, 0.f, 0.f),
+			glm::vec3(2.f, 2.f, 2.f),
+			glm::vec3(0.8f, 0.8f, 0.8f),
+			true,
+			glm::vec3(2.f, 2.f, 2.f),
+			1,
+			"Object",
+			glm::vec3(0.f, 0.f, 0.f)
+		);
+		gameEntities.push_back(gravityExample);
+
 		//=====================================setup cameras==========================================
 		Camera* freeCam = CreateCamera(
 			glm::vec3(0.0f, 0.0f, -20.f),
@@ -380,9 +419,49 @@ int main()
 			window,
 			false);
 
+		Camera* camSLERP = CreateCamera(
+			glm::vec3(70.f, 10.f, -20.f),
+			glm::vec3(0.0f, 0.0f, 1.f),
+			glm::vec3(0.0f, 1.f, 0.0f),
+			width,
+			height,
+			window,
+			false);
+
+		Camera* camShear = CreateCamera(
+			glm::vec3(90.f, 5.f, -20.f),
+			glm::vec3(0.0f, 0.0f, 1.f),
+			glm::vec3(0.0f, 1.f, 0.0f),
+			width,
+			height,
+			window,
+			false);
+
+		Camera* camLinearM = CreateCamera(
+			glm::vec3(0.f, 40.f, -70.f),
+			glm::vec3(0.0f, -1.0f, 0.f),
+			glm::vec3(0.0f, 0.f, 1.0f),
+			width,
+			height,
+			window,
+			false);
+
+		Camera* camGravity = CreateCamera(
+			glm::vec3(40.f, 20.f, 0.f),
+			glm::vec3(0.0f, 0.f, -1.f),
+			glm::vec3(0.0f, 1.f, 0.0f),
+			width,
+			height,
+			window,
+			false);
+
 		cameras.push_back(camBezier);
 		cameras.push_back(camScale);
 		cameras.push_back(camLERP);
+		cameras.push_back(camSLERP);
+		cameras.push_back(camShear);
+		cameras.push_back(camLinearM);
+		cameras.push_back(camGravity);
 
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LESS);
@@ -431,11 +510,17 @@ int main()
 			//update scaling example
 			UpdateScaleExample(scaleExample);
 
+			//update shearing example
+			UpdateSheerExample(shearingExample);
+
 			//update lerp example
 			UpdateLERPExample(lerpExample);
 
 			//update slerp example
 			UpdateSLERPExample(slerpExample);
+
+			//update gravity example
+			UpdateGravityExample(gravityExample);
 
 			//update cameras
 			CheckUpdateCameras();
@@ -671,6 +756,34 @@ void UpdateScaleExample(GameEntity *gameObj)
 	gameObj->eulerAngles.z += 0.003f;
 }
 
+// ========================================================== update Sheer example
+void UpdateSheerExample(GameEntity *gameObj)
+{
+	glm::vec3 shearSet = glm::vec3(0.f, 0.f, 0.f);
+	shearAmount += (shearDir % 2 == 0) ? 0.01f : -0.01f;
+	if (shearAmount >= 1.f || shearAmount <= 0.f)
+	{
+		shearAmount = (shearAmount >= 1.f) ? 1.f : 0.f;
+		shearDir++;
+		if (shearDir == 6) { shearDir = 0; }
+	}
+
+	if (shearDir == 0 || shearDir == 1)
+	{
+		shearSet.x = shearAmount;
+	}
+	else if (shearDir == 2 || shearDir == 3)
+	{
+		shearSet.y = shearAmount;
+	}
+	else
+	{
+		shearSet.z = shearAmount;
+	}
+
+	gameObj->shear = shearSet;
+}
+
 // ========================================================== create LERP example
 void SetupLERPExample(Mesh *bMesh, Material *bMat)
 {
@@ -740,7 +853,6 @@ void SetupSLERPExample(Mesh *bMesh, Material *bMat)
 	{
 		float t = step * i;
 		glm::vec3 pos = interpolate.SLERP(slerpStart, slerpEnd, t);
-		std::cout << "Creating new obj @: [" << pos.x << ", " << pos.y << ", " << pos.z << "]@t: " << t << std::endl;
 		GameEntity* obj = new GameEntity(
 			bMesh,
 			bMat,
@@ -905,7 +1017,6 @@ void CreatePhysicsExample1(Mesh *mesh, Material *mat)
 		float randomZ = -85.f + (static_cast <float> (rand() / (static_cast <float> (RAND_MAX / (-55.f - (-85.f))))));
 		
 		glm::vec3 pos = glm::vec3((0.7f * i) + 1.f - 18.f, -6.f, randomZ);
-		std::cout << pos.x << "," << pos.y << "," << pos.z << std::endl;
 		GameEntity* cube = new GameEntity(
 			mesh,
 			mat,
@@ -969,13 +1080,11 @@ void QuadTree(std::vector<GameEntity*> quadify, GameEntity* floor, glm::vec3 cen
 
 	for (int i = 0; i < topRight.size(); i++)
 	{
-		std::cout << "Top Right Quad: " << topRight.size() << std::endl;
 		topRight[i]->Update(topRight, i, sound);
 	}
 
 	for (int i = 0; i < bottomRight.size(); i++)
 	{
-		//std::cout << "Top Right Quad: " << topRight.size() << std::endl;
 		bottomRight[i]->Update(bottomRight, i, sound);
 	}
 
@@ -990,6 +1099,14 @@ void QuadTree(std::vector<GameEntity*> quadify, GameEntity* floor, glm::vec3 cen
 	}
 }
 
+void UpdateGravityExample(GameEntity* gameObj)
+{
+	if (gameObj->position.y <= -7.f)
+	{
+		gameObj->position.y = -7.f;
+		gameObj->ApplyForce(glm::vec3(0.f, 2.f, 0.f));
+	}
+}
 
 // ========================================================== Update input based on cameras
 void CheckUpdateCameras()
