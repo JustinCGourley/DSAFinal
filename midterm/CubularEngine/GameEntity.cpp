@@ -120,7 +120,7 @@ void GameEntity::CheckCollisions(std::vector<GameEntity*> entities, int num, irr
 				}
 
 				if (this->tag == std::string("SoundCube")) {
-					engine->play2D("../libraries/irrKlang-1.5.0/media/explosion.wav", false);
+					engine->play2D("../libraries/irrKlang-1.5.0/media/bounce.wav", false);
 				}
 
 				//glm::vec3 positionDiff = (entities[i]->position - this->position) - (entities[i]->position - (this->position + this->velocity));

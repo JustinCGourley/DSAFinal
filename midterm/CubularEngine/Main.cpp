@@ -189,7 +189,7 @@ int main()
 		std::cout << "Description:" << std::endl;
 		std::cout << "This test scene contains 7 exaples to show off the tools we have made that could be used in other projects.\n" << std::endl;
 		std::cout << "Controls:" << std::endl;
-		std::cout << "The scene contains 8 cameras, your starting camera is a free cam (use WASD and mouse to control the camera)\nIt also contains 7 static cameras to show off each test, use the left and right arrow keys to swap cameras" << std::endl;
+		std::cout << "Hiting escape will close the window. The scene contains 8 cameras, your starting camera is a free cam (use WASD and mouse to control the camera)\nIt also contains 7 static cameras to show off each test, use the left and right arrow keys to swap cameras" << std::endl;
 		std::cout << "\n\n-Camera Descriptions-\n" << std::endl;
 		std::cout << "[1] Free cam: A free moving camera that allows the user to move around the scene at their own will (WASD and mouse to move)" << std::endl;
 		std::cout << "[2] Bezier Curve: This example shows an object moving along a generated bezier curve, along with cubes showing the curve" << std::endl;
@@ -200,7 +200,7 @@ int main()
 		std::cout << "[7] Linear Momentum: This example starts by randomly spawning 35 game entities with physics enabled (without friction on the surface below them) and applying a random force to each one, to showcase our collisions, and physics with linear momentum. We also take advantage of quadtree with this example, to cut back on the number of collision checks that are needed each update." << std::endl;
 		std::cout << "[8] Gravity Example: Another example showcasing physics and collisions, this time with an object falling with just gravity, and when hitting the ground, applying a force upwards again, until gravity makes it fall back down." << std::endl;
 		std::cout << "\n\n-Other Stuff-:" << std::endl;
-		std::cout << "Music is playing in the background on loop (song: )" << std::endl;
+		std::cout << "Music is playing in the background on loop (song: Last Train Home by Pat Metheny Group)" << std::endl;
 		std::cout << "In the gravity example an explosion noise is played whenever a collision is detected" << std::endl;
 
 
@@ -372,8 +372,6 @@ int main()
 		);
 
 		gameEntities.push_back(floor);
-		staticEntities.push_back(floor);
-		octreeEntities.push_back(floor);
 
 		//======================================= create no gravity linear momentum example =======================
 
@@ -484,6 +482,8 @@ int main()
         glDepthFunc(GL_LESS);
 
 
+		staticEntities.push_back(floor);
+		octreeEntities.push_back(floor);
         //--------------------================================start main loop========================----------------------------
         while (!glfwWindowShouldClose(window))
         {
@@ -586,9 +586,20 @@ int main()
 		delete bMesh;
 		delete bMat;
 
+		delete bezierCurve;
+
 		for (int i = 0; i < gameEntities.size(); i++)
 		{
 			delete gameEntities[i];
+		}
+		for (int i = 0; i < staticEntities.size()-1; i++)
+		{
+			delete staticEntities[i];
+		}
+
+		for (int i = 0; i < octreeEntities.size()-1; i++)
+		{
+			delete octreeEntities[i];
 		}
 		//cubeGraph.clear();
 		for (int i = 0; i < cameras.size(); i++)
