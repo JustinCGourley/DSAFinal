@@ -37,13 +37,13 @@ GameEntity::~GameEntity()
 {
 }
 
-void GameEntity::Update(std::vector<GameEntity*> entities, int num)
+void GameEntity::Update(std::vector<GameEntity*> entities, int num, irrklang::ISoundEngine* engine)
 {
 
 	if (this->applyPhysics)
 	{
 		this->UpdatePhysics();
-		this->CheckCollisions(entities, num);
+		this->CheckCollisions(entities, num, engine);
 		this->UpdatePosition();
 	}
 	else {
@@ -89,7 +89,7 @@ void GameEntity::UpdatePhysics()
 	//check collisions
 }
 
-void GameEntity::CheckCollisions(std::vector<GameEntity*> entities, int num)
+void GameEntity::CheckCollisions(std::vector<GameEntity*> entities, int num, irrklang::ISoundEngine* engine)
 {
 	for (int i = 0; i < entities.size(); i++)
 	{
@@ -108,6 +108,10 @@ void GameEntity::CheckCollisions(std::vector<GameEntity*> entities, int num)
 				if (entities[i]->tag == std::string("Floor")) {
 					entities[i]->velocity = glm::vec3(0.f, 0.f, 0.f);
 					entities[i]->weight = this->weight;
+				}
+
+				if (entities[i]->tag == std::string("Cube")) {
+					engine->play2D("../libraries/irrKlang-1.5.0/media/explosion.wav", false);
 				}
 
 				//glm::vec3 positionDiff = (entities[i]->position - this->position) - (entities[i]->position - (this->position + this->velocity));

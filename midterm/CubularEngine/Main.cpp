@@ -5,7 +5,6 @@
 #include "GameEntity.h"
 #include "Material.h"
 #include "Input.h"
-#include "irrKlang.h"
 #include "BezierCurve.h"
 #include "Interpolate.h"
 
@@ -60,7 +59,9 @@ int main()
 
 	irrklang::ISoundEngine* engine = irrklang::createIrrKlangDevice();
 
-	//engine->play2D("../libraries/irrKlang-1.5.0/media/getout.ogg", true);
+	engine->setSoundVolume(0.25f);
+
+	//engine->play2D("../libraries/irrKlang-1.5.0/media/explosion.wav", false);
 
     {
         //init GLFW
@@ -393,7 +394,7 @@ int main()
 
 			for (int i = 0; i < gameEntities.size(); i++)
 			{
-				gameEntities[i]->Update(gameEntities, i);
+				gameEntities[i]->Update(gameEntities, i, engine);
 			}
 			gameEntities[0]->ApplyForce(glm::vec3(0.001f, 0.0f, 0.0f));
 			cameras[curCamera]->Update();
@@ -437,6 +438,9 @@ int main()
                 glfwSwapBuffers(window);
             }
         }
+
+		//Delete Sound engine
+		engine->drop();
 
         //de-allocate our mesh!
         delete myMesh;
