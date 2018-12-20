@@ -1,5 +1,13 @@
 #include "Interpolate.h"
+#include "glm/gtc/matrix_transform.hpp"
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include "glm/gtc/quaternion.hpp"
+#include "glm/gtx/quaternion.hpp"
+
+#include "glm/gtx/transform2.hpp"
+
+#include <glm/gtx/vector_angle.hpp>
 
 
 Interpolate::Interpolate()
@@ -14,20 +22,22 @@ glm::vec3 Interpolate::LERP(glm::vec3 start, glm::vec3 end, float time)
 
 glm::vec3 Interpolate::SLERP(glm::vec3 start, glm::vec3 end, float time)
 {
-	float dot = glm::dot(start, end);
 	//std::cout << "Start: " << start.y << std::endl;
-	//std::cout << "End: " << end.y << "\n";
-	//std::cout << "dot: " << dot << "\n";
-	dot = glm::clamp(dot, -1.f, 1.f);
-	//std::cout << "clamed dot now: " << dot << "\n";
-	float theta = glm::acos(dot) * time;
-	//std::cout << "theta: " << theta << "\n";
-	glm::vec3 relVec = (end - start) * dot;
-	//std::cout << "relVec: " << relVec.x << "\n";
-	relVec = glm::normalize(relVec);
-	//std::cout << "normalizedRelVec: " << relVec.x << "\n";
-	//std::cout << "outPutx: " << ((start * cos(theta)) + (relVec * sin(theta))).x << "\n";
-	return ((start * cos(theta)) + (relVec * sin(theta)));
+	//std::cout << "End: " << end.y << std::endl;
+	//std::cout << "Time: " << time << std::endl;
+
+	float angle = glm::orientedAngle(start, end, glm::vec3(0.f, 1.0f, 0.f));
+
+	glm::vec3 vec1 = ((glm::sin(1.0f - time)*angle) / glm::sin(angle)) * start;
+	glm::vec3 vec2 = (glm::sin(time*angle) / glm::sin(angle)) * end;
+	glm::vec3 vec = vec1 + vec2;
+
+	std::cout << "Vec: " << time << std::endl;
+	std::cout << "x: " << vec.x << std::endl;
+	std::cout << "y: " << vec.y << std::endl;
+	std::cout << "z: " << vec.z << std::endl;
+
+	return vec;
 }
 
 Interpolate::~Interpolate()
