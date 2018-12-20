@@ -92,7 +92,7 @@ int main()
         //create & init window, set viewport
         int width = 1200;
         int height = 800;
-        GLFWwindow* window = glfwCreateWindow(width, height, "Babby's First Cube?", nullptr, nullptr);
+        GLFWwindow* window = glfwCreateWindow(width, height, "Justin & Jeb - Final Project: Physics Scene", nullptr, nullptr);
         {
             if (window == nullptr)
             {
