@@ -20,9 +20,12 @@ void UpdateSLERPExample(GameEntity *);
 void SetupLERPExample(Mesh *, Material *);
 void SetupSLERPExample(Mesh *, Material *);
 Camera* CreateCamera(glm::vec3 pos, glm::vec3 forward, glm::vec3 up, int width, int height, GLFWwindow *window, bool controllable);
+void CreatePhysicsExample1(Mesh *mesh, Material *mat);
 void CheckUpdateCameras();
 
 std::vector<GameEntity*> gameEntities;
+std::vector<GameEntity*> staticEntities;
+std::vector<GameEntity*> octreeEntities;
 
 
 //bezier cube example vars
@@ -245,7 +248,7 @@ int main()
 			"Object"
 		);
 
-		gameEntities.push_back(bezierCube);
+		staticEntities.push_back(bezierCube);
 
 		//============ create scaling example=============================
 		GameEntity* scaleExample = new GameEntity(
@@ -261,7 +264,7 @@ int main()
 			"Object"
 		);
 
-		gameEntities.push_back(scaleExample);
+		staticEntities.push_back(scaleExample);
 
 		//================== create lerp example ========================
 
@@ -281,7 +284,7 @@ int main()
 			"Object"
 		);
 
-		gameEntities.push_back(lerpExample);
+		staticEntities.push_back(lerpExample);
 
 		//================== create slerp example ========================
 
@@ -301,7 +304,7 @@ int main()
 			"Object"
 		);
 
-		gameEntities.push_back(slerpExample);
+		staticEntities.push_back(slerpExample);
 
 		//create floor 
 		Mesh* floorMesh = new Mesh();
@@ -322,7 +325,12 @@ int main()
 		);
 
 		gameEntities.push_back(floor);
+		staticEntities.push_back(floor);
+		octreeEntities.push_back(floor);
 
+		//======================================= create no gravity linear momentum example =======================
+
+		CreatePhysicsExample1(floorMesh, floorMat);
 
 		Input::GetInstance()->Init(window);
 
@@ -395,7 +403,17 @@ int main()
 			{
 				gameEntities[i]->Update(gameEntities, i);
 			}
-			gameEntities[0]->ApplyForce(glm::vec3(0.001f, 0.0f, 0.0f));
+
+			for (int i = 0; i < staticEntities.size(); i++)
+			{
+				staticEntities[i]->Update(staticEntities, i);
+			}
+
+			for (int i = 0; i < octreeEntities.size(); i++)
+			{
+				octreeEntities[i]->Update(octreeEntities, i);
+			}
+
 			cameras[curCamera]->Update();
 
 			//update bezier example
@@ -425,6 +443,14 @@ int main()
 			for (int i = 0; i < gameEntities.size(); i++)
 			{
 				gameEntities[i]->Render(cameras[curCamera]);
+			}
+			for (int i = 0; i < staticEntities.size(); i++)
+			{
+				staticEntities[i]->Render(cameras[curCamera]);
+			}
+			for (int i = 0; i < octreeEntities.size(); i++)
+			{
+				octreeEntities[i]->Render(cameras[curCamera]);
 			}
 
 
@@ -468,6 +494,7 @@ int main()
     return 0;
 }
 
+// ========================================================== TODO: remove this later
 void CreateManyCubes(Mesh* myMesh, Material* myMaterial)
 {
 	srand(time(NULL));
@@ -522,6 +549,7 @@ void CreateManyCubes(Mesh* myMesh, Material* myMaterial)
 	}
 }
 
+// ========================================================== create bezier curve example
 void CreateBezierExample(Mesh* bMesh, Material* bMat, BezierCurve* bezierCurve)
 {
 	int pointCount = 100;
@@ -543,7 +571,7 @@ void CreateBezierExample(Mesh* bMesh, Material* bMat, BezierCurve* bezierCurve)
 			0,
 			"Object"
 		);
-		gameEntities.push_back(myGameEntity);
+		staticEntities.push_back(myGameEntity);
 	}
 
 	glm::vec2 pos = bezierCurve->GetPoint(0);
@@ -574,10 +602,11 @@ void CreateBezierExample(Mesh* bMesh, Material* bMat, BezierCurve* bezierCurve)
 		"Object"
 	);
 
-	gameEntities.push_back(start);
-	gameEntities.push_back(end);
+	staticEntities.push_back(start);
+	staticEntities.push_back(end);
 }
 
+// ========================================================== update bezier curve example
 void UpdateBezierExample(BezierCurve *bezierCurve, GameEntity *gameObj)
 {
 	bezierCubeTime += (bezierDirForward) ? bezierCubeStep : -bezierCubeStep;
@@ -593,6 +622,7 @@ void UpdateBezierExample(BezierCurve *bezierCurve, GameEntity *gameObj)
 	gameObj->position.z = 5;
 }
 
+// ========================================================== update Scale example
 void UpdateScaleExample(GameEntity *gameObj)
 {
 	glm::vec3 scaleSet = glm::vec3(1.f, 1.f, 1.f);
@@ -622,6 +652,7 @@ void UpdateScaleExample(GameEntity *gameObj)
 	gameObj->eulerAngles.y += 0.001f;
 }
 
+// ========================================================== create LERP example
 void SetupLERPExample(Mesh *bMesh, Material *bMat)
 {
 	int pointCount = 100;
@@ -644,7 +675,7 @@ void SetupLERPExample(Mesh *bMesh, Material *bMat)
 			"Object"
 		);
 
-		gameEntities.push_back(obj);
+		staticEntities.push_back(obj);
 	}
 
 	//start / end pos
@@ -673,10 +704,11 @@ void SetupLERPExample(Mesh *bMesh, Material *bMat)
 		"Object"
 	);
 
-	gameEntities.push_back(lerpStartObj);
-	gameEntities.push_back(lerpEndObj);
+	staticEntities.push_back(lerpStartObj);
+	staticEntities.push_back(lerpEndObj);
 }
 
+// ========================================================== create SLERP example
 void SetupSLERPExample(Mesh *bMesh, Material *bMat)
 {
 	int pointCount = 100;
@@ -700,7 +732,7 @@ void SetupSLERPExample(Mesh *bMesh, Material *bMat)
 			"Object"
 		);
 
-		gameEntities.push_back(obj);
+		staticEntities.push_back(obj);
 	}
 
 	//start / end pos
@@ -729,10 +761,11 @@ void SetupSLERPExample(Mesh *bMesh, Material *bMat)
 		"Object"
 	);
 
-	gameEntities.push_back(slerpStartObj);
-	gameEntities.push_back(slerpEndObj);
+	staticEntities.push_back(slerpStartObj);
+	staticEntities.push_back(slerpEndObj);
 }
 
+// ========================================================== update LERP example
 void UpdateLERPExample(GameEntity *gameObj)
 {
 	lerpTime += (lerpDirForward) ? lerpStep : -lerpStep;
@@ -743,6 +776,7 @@ void UpdateLERPExample(GameEntity *gameObj)
 	gameObj->position = pos;
 }
 
+// ========================================================== update SLERP rotation example
 //TODO: update this SLERP to be rotations instead of movement (oops)
 void UpdateSLERPExample(GameEntity *gameObj)
 {
@@ -754,6 +788,7 @@ void UpdateSLERPExample(GameEntity *gameObj)
 	//gameObj->position = pos;
 }
 
+// ========================================================== creates a camera based on given params
 Camera* CreateCamera(glm::vec3 pos, glm::vec3 forward, glm::vec3 up, int width, int height, GLFWwindow *window, bool control)
 {
 	Camera* camera = new Camera(
@@ -772,6 +807,102 @@ Camera* CreateCamera(glm::vec3 pos, glm::vec3 forward, glm::vec3 up, int width, 
 	return camera;
 }
 
+// ========================================================== create linear momentum example 1 (box)
+void CreatePhysicsExample1(Mesh *mesh, Material *mat)
+{
+	GameEntity* wall1 = new GameEntity(
+		mesh,
+		mat,
+		glm::vec3(0.f, -7.f, -50.f),
+		glm::vec3(0.f, 0.f, 0.f),
+		glm::vec3(20.f, 2.f, 2.0f),
+		glm::vec3(0.4f, 0.4f, 0.4f),
+		false,
+		glm::vec3(20.f, 2.f, 2.f),
+		1,
+		"Wall"
+	);
+
+	GameEntity* wall2 = new GameEntity(
+		mesh,
+		mat,
+		glm::vec3(0.f, -7.f, -90.f),
+		glm::vec3(0.f, 0.f, 0.f),
+		glm::vec3(20.f, 2.f, 2.f),
+		glm::vec3(0.4f, 0.4f, 0.4f),
+		false,
+		glm::vec3(20.f, 2.f, 2.f),
+		1,
+		"Wall"
+	);
+
+	GameEntity* wall3 = new GameEntity(
+		mesh,
+		mat,
+		glm::vec3(-20.f, -7.f, -70.f),
+		glm::vec3(0.f, 0.f, 0.f),
+		glm::vec3(2.f, 2.f, 20.f),
+		glm::vec3(0.4f, 0.4f, 0.4f),
+		false,
+		glm::vec3(2.f, 2.f, 20.f),
+		1,
+		"Wall"
+	);
+
+	GameEntity* wall4 = new GameEntity(
+		mesh,
+		mat,
+		glm::vec3(20.f, -7.f, -70.f),
+		glm::vec3(0.f, 0.f, 0.f),
+		glm::vec3(2.f, 2.f, 20.f),
+		glm::vec3(0.4f, 0.4f, 0.4f),
+		false,
+		glm::vec3(2.f, 2.f, 20.f),
+		1,
+		"Wall"
+	);
+
+	octreeEntities.push_back(wall1);
+	octreeEntities.push_back(wall2);
+	octreeEntities.push_back(wall3);
+	octreeEntities.push_back(wall4);
+
+	//create a bunch of entities to move around (and apply random forces to each one)
+	int cubeCount = 50;
+	srand(time(NULL));
+
+	for (int i = 0; i < cubeCount; i++)
+	{
+		float randomZ = -85.f + (static_cast <float> (rand() / (static_cast <float> (RAND_MAX / (-55.f - (-85.f))))));
+		
+		glm::vec3 pos = glm::vec3((0.7f * i) + 1.f - 20.f, -6.f, randomZ);
+		std::cout << pos.x << "," << pos.y << "," << pos.z << std::endl;
+		GameEntity* cube = new GameEntity(
+			mesh,
+			mat,
+			pos,
+			glm::vec3(0.f, 0.f, 0.f),
+			glm::vec3(0.2f, 0.2f, 0.2f),
+			glm::vec3(0.7f, 0.7f, 0.7f),
+			true,
+			glm::vec3(0.2f, 0.2f, 0.2f),
+			1,
+			"Object"
+		);
+
+		float dirX = -0.5f + (static_cast <float> (rand() / (static_cast <float> (RAND_MAX / (0.5f - (-0.5f))))));
+		float dirZ = -0.5f + (static_cast <float> (rand() / (static_cast <float> (RAND_MAX / (0.5f - (-0.5f))))));
+
+		glm::vec3 randomForce = glm::vec3(dirX, 0.f, 0);
+
+		cube->ApplyForce(randomForce);
+
+		octreeEntities.push_back(cube);
+	}
+}
+
+
+// ========================================================== Update input based on cameras
 void CheckUpdateCameras()
 {
 	if (Input::GetInstance()->IsKeyDown(GLFW_KEY_RIGHT) && !cameraSwap)

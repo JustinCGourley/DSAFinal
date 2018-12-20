@@ -31,10 +31,11 @@ public:
     /// </summary>
     /// <param name="camera">Pointer to the rendering camera</param>
     /// <param name="worldMatrix">Matrix from model to world space</param>
-    void Bind(
-        Camera* camera, 
-        glm::mat4 worldMatrix,
-		glm::vec3 color
+	void Bind(
+		Camera* camera,
+		glm::mat4 worldMatrix,
+		glm::vec3 color,
+		float alpha
     );
 };
 

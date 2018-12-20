@@ -49,6 +49,7 @@ public:
 	bool applyPhysics;
 	bool applyGravity;
 	float weight;
+	float alpha;
 	std::string tag;
     /// <summary>
     /// Destruction

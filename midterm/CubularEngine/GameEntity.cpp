@@ -27,6 +27,7 @@ GameEntity::GameEntity(
 	this->weight = weight;
 	this->velocity = glm::vec3(0, 0, 0);
 	this->tag = tag;
+	this->alpha = 1.f;
 }
 
 GameEntity::~GameEntity()
@@ -209,6 +210,6 @@ void GameEntity::ApplyForce(glm::vec3 force)
 
 void GameEntity::Render(Camera* camera)
 {
-    material->Bind(camera, worldMatrix, color);
+    material->Bind(camera, worldMatrix, color, alpha);
     mesh->Render();
 }
