@@ -521,9 +521,10 @@ void CreateManyCubes(Mesh* myMesh, Material* myMaterial)
 			next = true;
 			//get a random x and y
 			randomX = -13.8f + (static_cast <float> (rand() / (static_cast <float> (RAND_MAX / (13.8f - (-13.8f))))));
+			//randomX = 0;
 			//randomY = (static_cast <float> (rand() / (static_cast <float> (RAND_MAX / (9.7f - (-9.7f))))));
 			randomY = 0;
-			//randomZ = 5.f + (static_cast <float> (rand() / (static_cast <float> (RAND_MAX / (20.f - (5.f))))));
+			//randomZ = -13.8f + (static_cast <float> (rand() / (static_cast <float> (RAND_MAX / (13.8f - (-13.8f))))));
 			randomZ = 0;
 
 			//see if this position will intersect with another cube | if so, remake the position
@@ -919,7 +920,7 @@ void CreatePhysicsExample1(Mesh *mesh, Material *mat)
 		float dirX = -0.5f + (static_cast <float> (rand() / (static_cast <float> (RAND_MAX / (0.5f - (-0.5f))))));
 		float dirZ = -0.5f + (static_cast <float> (rand() / (static_cast <float> (RAND_MAX / (0.5f - (-0.5f))))));
 
-		glm::vec3 randomForce = glm::vec3(dirX, 0.f, 0);
+		glm::vec3 randomForce = glm::vec3(dirX, 0.f, dirZ);
 
 		cube->ApplyForce(randomForce);
 
