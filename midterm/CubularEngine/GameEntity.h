@@ -50,6 +50,7 @@ public:
 	bool applyPhysics;
 	bool applyGravity;
 	float weight;
+	float alpha;
 	std::string tag;
 	glm::vec3 shear;
     /// <summary>

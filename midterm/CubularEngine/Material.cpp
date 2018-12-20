@@ -11,7 +11,7 @@ Material::~Material()
 
 
 
-void Material::Bind(Camera * camera, glm::mat4 worldMatrix, glm::vec3 color)
+void Material::Bind(Camera * camera, glm::mat4 worldMatrix, glm::vec3 color, float alpha)
 {
     //enable shader
     //TODO - refactor this binding call to be managed by a RenderManager
@@ -36,7 +36,7 @@ void Material::Bind(Camera * camera, glm::mat4 worldMatrix, glm::vec3 color)
     );
 
 	int colorLocation = glGetUniformLocation(shaderProgram, "colorSet");
-	glUniform4f(colorLocation, color.x, color.y, color.z, 1.0f);
+	glUniform4f(colorLocation, color.x, color.y, color.z, alpha);
 
     //get projection matrix location, and feed the value
     //TODO - cache this as a private varaible (on init) because the location is same every frame
