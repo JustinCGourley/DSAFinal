@@ -54,8 +54,8 @@ float lerpStep = 1.f / 100.f;
 bool lerpDirForward = true;
 
 //SLERP example
-glm::vec3 slerpStart = glm::vec3(70.f, 10.f, 5.f);
-glm::vec3 slerpEnd = glm::vec3(80.f, 5.f, 10.f);
+glm::vec3 slerpStart = glm::vec3(0.f, 0.f, 0.f);
+glm::vec3 slerpEnd = glm::vec3(0.f, 0.15f, 0.15f);
 float slerpTime = 0;
 float slerpStep = 1.f / 100.f;
 bool slerpDirForward = true;
@@ -322,9 +322,9 @@ int main()
 		GameEntity* slerpExample = new GameEntity(
 			bMesh,
 			bMat,
-			slerpStart,
+			glm::vec3(75.f, 6.f, 5.f),
 			glm::vec3(0.f, 0.f, 0.f),
-			glm::vec3(0.5f, 0.5f, 0.5f),
+			glm::vec3(2.f, 2.f, 2.f),
 			glm::vec3(0.8f, 0.8f, 0.8f),
 			false,
 			glm::vec3(0.f, 0.f, 0.f),
@@ -853,53 +853,7 @@ void SetupSLERPExample(Mesh *bMesh, Material *bMat)
 	{
 		float t = step * i;
 		glm::vec3 pos = interpolate.SLERP(slerpStart, slerpEnd, t);
-		GameEntity* obj = new GameEntity(
-			bMesh,
-			bMat,
-			interpolate.SLERP(slerpStart, slerpEnd, t),
-			glm::vec3(0.f, 0.f, 0.f),
-			glm::vec3(.02f, .02f, .02f),
-			glm::vec3(0.8f, 0.8f, 0.8f),
-			false,
-			glm::vec3(0.f, 0.f, 0.f),
-			0,
-			"Object",
-			glm::vec3(0.f, 0.f, 0.f)
-		);
-
-		staticEntities.push_back(obj);
 	}
-
-	//start / end pos
-	GameEntity* slerpStartObj = new GameEntity(
-		bMesh,
-		bMat,
-		slerpStart,
-		glm::vec3(0.f, 0.f, 0.f),
-		glm::vec3(.1f, .1f, .1f),
-		glm::vec3(1.0f, 0.0f, 0.0f),
-		false,
-		glm::vec3(0.f, 0.f, 0.f),
-		0,
-		"Object",
-		glm::vec3(0.f, 0.f, 0.f)
-	);
-	GameEntity* slerpEndObj = new GameEntity(
-		bMesh,
-		bMat,
-		slerpEnd,
-		glm::vec3(0.f, 0.f, 0.f),
-		glm::vec3(.1f, .1f, .1f),
-		glm::vec3(0.0f, 1.0f, 0.0f),
-		false,
-		glm::vec3(0.f, 0.f, 0.f),
-		0,
-		"Object",
-		glm::vec3(0.f, 0.f, 0.f)
-	);
-
-	staticEntities.push_back(slerpStartObj);
-	staticEntities.push_back(slerpEndObj);
 }
 
 // ========================================================== update LERP example
@@ -920,9 +874,9 @@ void UpdateSLERPExample(GameEntity *gameObj)
 	slerpTime += (slerpDirForward) ? slerpStep : -slerpStep;
 	if (slerpTime >= 1.f || slerpTime <= 0.f) { slerpDirForward = !slerpDirForward; }
 
-	//glm::vec3 pos = interpolate.SLERP(slerpStart, slerpEnd, slerpTime);
+	glm::vec3 angle = interpolate.SLERP(slerpStart, slerpEnd, slerpTime);
 
-	//gameObj->position = pos;
+	gameObj->eulerAngles = angle;
 }
 
 // ========================================================== creates a camera based on given params
