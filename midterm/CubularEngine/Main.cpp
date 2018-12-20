@@ -10,7 +10,6 @@
 
 
 //methods
-void CreateManyCubes(Mesh*, Material*);
 void CreateBezierExample(Mesh*, Material*, BezierCurve*);
 void UpdateBezierExample(BezierCurve *, GameEntity *);
 void UpdateScaleExample(GameEntity *);
@@ -69,9 +68,9 @@ int main()
 
 	irrklang::ISoundEngine* engine = irrklang::createIrrKlangDevice();
 
-	engine->setSoundVolume(0.1f);
+	engine->setSoundVolume(0.03f);
 
-	//engine->play2D("../libraries/irrKlang-1.5.0/media/explosion.wav", false);
+	//engine->play2D("../libraries/irrKlang-1.5.0/media/explosion.wav", true);
 
     {
         //init GLFW
@@ -183,6 +182,28 @@ int main()
         std::cout << "Shaders compiled attached, and linked!" << std::endl;
 #endif // _DEBUG
 
+
+		//CONSOLE INTO
+
+		std::cout << "OpenGL Testing Grounds\nCreated by Justin Gourley & Jeb Atkinson\n\n" << std::endl;
+		std::cout << "Description:" << std::endl;
+		std::cout << "This test scene contains 7 exaples to show off the tools we have made that could be used in other projects.\n" << std::endl;
+		std::cout << "Controls:" << std::endl;
+		std::cout << "The scene contains 8 cameras, your starting camera is a free cam (use WASD and mouse to control the camera)\nIt also contains 7 static cameras to show off each test, use the left and right arrow keys to swap cameras" << std::endl;
+		std::cout << "\n\n-Camera Descriptions-\n" << std::endl;
+		std::cout << "[1] Free cam: A free moving camera that allows the user to move around the scene at their own will (WASD and mouse to move)" << std::endl;
+		std::cout << "[2] Bezier Curve: This example shows an object moving along a generated bezier curve, along with cubes showing the curve" << std::endl;
+		std::cout << "[3] Rotation & Scaling: An example of a rotation of a game entity using quaternions, as well as scaling the cube in each direction" << std::endl;
+		std::cout << "[4] LERP: This shows a basic LERP, of an object moving from one given point to another along a linear generated path (green and red points are start and end points)" << std::endl;
+		std::cout << "[5] SLERP: This example shows SLERP being used to 'animate' a cube rotating from a rest state to a turned state, and then back." << std::endl;
+		std::cout << "[6] Shear: This shows a simple shear of a cube, on every axis one after another" << std::endl;
+		std::cout << "[7] Linear Momentum: This example starts by randomly spawning 35 game entities with physics enabled (without friction on the surface below them) and applying a random force to each one, to showcase our collisions, and physics with linear momentum. We also take advantage of quadtree with this example, to cut back on the number of collision checks that are needed each update." << std::endl;
+		std::cout << "[8] Gravity Example: Another example showcasing physics and collisions, this time with an object falling with just gravity, and when hitting the ground, applying a force upwards again, until gravity makes it fall back down." << std::endl;
+		std::cout << "\n\n-Other Stuff-:" << std::endl;
+		std::cout << "Music is playing in the background on loop (song: )" << std::endl;
+		std::cout << "In the gravity example an explosion noise is played whenever a collision is detected" << std::endl;
+
+
 		 
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
@@ -227,11 +248,7 @@ int main()
             1.0f,-1.0f, 1.0f
         };
 
-		//=================== create a bunch of cubes=============================
-		Mesh* myMesh = new Mesh();
-		myMesh->InitWithVertexArray(vertices, _countof(vertices), shaderProgram);
-		Material* myMaterial = new Material(shaderProgram);
-		CreateManyCubes(myMesh, myMaterial);
+
 
 		//==================== create bezier cubes==================================
 		Mesh* bMesh = new Mesh();
@@ -375,7 +392,7 @@ int main()
 			true,
 			glm::vec3(2.f, 2.f, 2.f),
 			1,
-			"Object",
+			"SoundCube",
 			glm::vec3(0.f, 0.f, 0.f)
 		);
 		gameEntities.push_back(gravityExample);
@@ -562,8 +579,6 @@ int main()
 		engine->drop();
 
         //de-allocate our mesh!
-        delete myMesh;
-        delete myMaterial;
 
 		delete floorMesh;
 		delete floorMat;
@@ -589,63 +604,6 @@ int main()
     _CrtDumpMemoryLeaks();
 #endif // _DEBUG
     return 0;
-}
-
-// ========================================================== TODO: remove this later
-void CreateManyCubes(Mesh* myMesh, Material* myMaterial)
-{
-	srand(time(NULL));
-
-	int cubeCount = 5;
-
-	int maxLoop = 50;
-	for (int i = 0; i < cubeCount; i++)
-	{
-		bool next = true;
-		float randomX, randomY, randomZ;
-		maxLoop = 50;
-		do
-		{
-			next = true;
-			//get a random x and y
-			randomX = -13.8f + (static_cast <float> (rand() / (static_cast <float> (RAND_MAX / (13.8f - (-13.8f))))));
-			//randomX = 0;
-			//randomY = (static_cast <float> (rand() / (static_cast <float> (RAND_MAX / (9.7f - (-9.7f))))));
-			randomY = 0;
-			//randomZ = -13.8f + (static_cast <float> (rand() / (static_cast <float> (RAND_MAX / (13.8f - (-13.8f))))));
-			randomZ = 0;
-
-			//see if this position will intersect with another cube | if so, remake the position
-			for (int j = 0; j < i; j++)
-			{
-				if (abs(gameEntities[j]->position.x - randomX) < 2.f && abs(gameEntities[j]->position.y - randomY) < 2.f)
-				{
-					next = false;
-					maxLoop--;
-					if (maxLoop <= 0)
-					{
-						next = true;
-					}
-				}
-			}
-		} while (!next);
-
-		//create the entity, also giving it a random color
-		GameEntity* myGameEntity = new GameEntity(
-			myMesh,
-			myMaterial,
-			glm::vec3(randomX, randomY, randomZ),
-			glm::vec3(0.f, 0.f, 0.f),
-			glm::vec3(1.f, 1.f, 1.f),
-			glm::vec3(0.8f, 0.8f, 0.8f),
-			true,
-			glm::vec3(1.f, 1.f, 1.f),
-			1,
-			"Cube",
-			glm::vec3(0.f, 0.f, 0.f)
-		);
-		gameEntities.push_back(myGameEntity);
-	}
 }
 
 // ========================================================== create bezier curve example
@@ -868,7 +826,6 @@ void UpdateLERPExample(GameEntity *gameObj)
 }
 
 // ========================================================== update SLERP rotation example
-//TODO: update this SLERP to be rotations instead of movement (oops)
 void UpdateSLERPExample(GameEntity *gameObj)
 {
 	slerpTime += (slerpDirForward) ? slerpStep : -slerpStep;
@@ -1089,18 +1046,4 @@ void CheckUpdateCameras()
 		cameraSwap = false;
 	}
 
-	//do all the changing of tests in here
-	
-	if (curCamera == 1)//bezier curve
-	{
-
-	}
-	else if (curCamera == 2)//scaling cube
-	{
-
-	}
-	else if (curCamera == 3)//lerp
-	{
-
-	}
 }

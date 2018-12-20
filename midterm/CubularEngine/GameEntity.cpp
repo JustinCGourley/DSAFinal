@@ -119,7 +119,7 @@ void GameEntity::CheckCollisions(std::vector<GameEntity*> entities, int num, irr
 					entities[i]->weight = this->weight;
 				}
 
-				if (entities[i]->tag == std::string("Cube")) {
+				if (this->tag == std::string("SoundCube")) {
 					engine->play2D("../libraries/irrKlang-1.5.0/media/explosion.wav", false);
 				}
 
