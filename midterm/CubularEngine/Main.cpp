@@ -44,10 +44,10 @@ float lerpStep = 1.f / 100.f;
 bool lerpDirForward = true;
 
 //SLERP example
-glm::vec3 slerpStart = glm::vec3(70.f, 10.f, 5.f);
-glm::vec3 slerpEnd = glm::vec3(80.f, 5.f, 10.f);
+glm::vec3 slerpStart = glm::vec3(0.0f, 0.0f, 0.0f);
+glm::vec3 slerpEnd = glm::vec3(0.0f, 0.8f, 0.0f);
 float slerpTime = 0;
-float slerpStep = 1.f / 100.f;
+float slerpStep = 1.0f / 100.0f;
 bool slerpDirForward = true;
 
 std::vector<Camera*> cameras;
@@ -59,7 +59,7 @@ int main()
 
 	irrklang::ISoundEngine* engine = irrklang::createIrrKlangDevice();
 
-	engine->setSoundVolume(0.1f);
+	engine->setSoundVolume(0.01f);
 
 	//engine->play2D("../libraries/irrKlang-1.5.0/media/explosion.wav", false);
 
@@ -289,15 +289,15 @@ int main()
 
 		//================== create slerp example ========================
 
-		SetupSLERPExample(bMesh, bMat);
+		//SetupSLERPExample(bMesh, bMat);
 
 		//moving var
 		GameEntity* slerpExample = new GameEntity(
 			bMesh,
 			bMat,
-			slerpStart,
-			glm::vec3(0.f, 0.f, 0.f),
-			glm::vec3(0.5f, 0.5f, 0.5f),
+			glm::vec3(80.f, 5.f, 10.f),
+			glm::vec3(0.f, 0.0f, 0.f),
+			glm::vec3(1.0f, 1.0f, 1.0f),
 			glm::vec3(0.8f, 0.8f, 0.8f),
 			false,
 			glm::vec3(0.f, 0.f, 0.f),
@@ -402,6 +402,7 @@ int main()
 				gameEntities[i]->Update(gameEntities, i, engine);
 			}
 			gameEntities[0]->ApplyForce(glm::vec3(0.001f, 0.0f, 0.0f));
+			gameEntities[1]->ApplyForce(glm::vec3(-0.001f, 0.0f, 0.0f));
 			cameras[curCamera]->Update();
 
 			//update bezier example
@@ -703,55 +704,8 @@ void SetupSLERPExample(Mesh *bMesh, Material *bMat)
 	for (int i = 0; i < pointCount; i++)
 	{
 		float t = step * i;
-		glm::vec3 pos = interpolate.SLERP(slerpStart, slerpEnd, t);
-		std::cout << "Creating new obj @: [" << pos.x << ", " << pos.y << ", " << pos.z << "]@t: " << t << std::endl;
-		GameEntity* obj = new GameEntity(
-			bMesh,
-			bMat,
-			interpolate.SLERP(slerpStart, slerpEnd, t),
-			glm::vec3(0.f, 0.f, 0.f),
-			glm::vec3(.02f, .02f, .02f),
-			glm::vec3(0.8f, 0.8f, 0.8f),
-			false,
-			glm::vec3(0.f, 0.f, 0.f),
-			0,
-			"Object",
-			glm::vec3(0.f, 0.f, 0.f)
-		);
-
-		gameEntities.push_back(obj);
+		glm::vec3 vec = interpolate.SLERP(slerpStart, slerpEnd, t);
 	}
-
-	//start / end pos
-	GameEntity* slerpStartObj = new GameEntity(
-		bMesh,
-		bMat,
-		slerpStart,
-		glm::vec3(0.f, 0.f, 0.f),
-		glm::vec3(.1f, .1f, .1f),
-		glm::vec3(1.0f, 0.0f, 0.0f),
-		false,
-		glm::vec3(0.f, 0.f, 0.f),
-		0,
-		"Object",
-		glm::vec3(0.f, 0.f, 0.f)
-	);
-	GameEntity* slerpEndObj = new GameEntity(
-		bMesh,
-		bMat,
-		slerpEnd,
-		glm::vec3(0.f, 0.f, 0.f),
-		glm::vec3(.1f, .1f, .1f),
-		glm::vec3(0.0f, 1.0f, 0.0f),
-		false,
-		glm::vec3(0.f, 0.f, 0.f),
-		0,
-		"Object",
-		glm::vec3(0.f, 0.f, 0.f)
-	);
-
-	gameEntities.push_back(slerpStartObj);
-	gameEntities.push_back(slerpEndObj);
 }
 
 void UpdateLERPExample(GameEntity *gameObj)
@@ -769,10 +723,10 @@ void UpdateSLERPExample(GameEntity *gameObj)
 {
 	slerpTime += (slerpDirForward) ? slerpStep : -slerpStep;
 	if (slerpTime >= 1.f || slerpTime <= 0.f) { slerpDirForward = !slerpDirForward; }
+	//std::cout << "Slerptime: " << slerpTime << std::endl;
+	glm::vec3 slerpAngles = interpolate.SLERP(slerpStart, slerpEnd, slerpTime);
 
-	//glm::vec3 pos = interpolate.SLERP(slerpStart, slerpEnd, slerpTime);
-
-	//gameObj->position = pos;
+	gameObj->eulerAngles = slerpAngles;
 }
 
 Camera* CreateCamera(glm::vec3 pos, glm::vec3 forward, glm::vec3 up, int width, int height, GLFWwindow *window, bool control)
