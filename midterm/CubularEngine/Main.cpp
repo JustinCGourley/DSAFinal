@@ -907,10 +907,10 @@ void CreatePhysicsExample1(Mesh *mesh, Material *mat)
 			mat,
 			pos,
 			glm::vec3(0.f, 0.f, 0.f),
-			glm::vec3(0.2f, 0.2f, 0.2f),
+			glm::vec3(0.5f, 0.5f, 0.5f),
 			glm::vec3(0.7f, 0.7f, 0.7f),
 			true,
-			glm::vec3(0.2f, 0.2f, 0.2f),
+			glm::vec3(0.5f, 0.5f, 0.5f),
 			1,
 			"Object",
 			glm::vec3(0.f, 0.f, 0.f)

@@ -113,6 +113,12 @@ void GameEntity::CheckCollisions(std::vector<GameEntity*> entities, int num, irr
 				(this->position.z + this->collider.z <= (entities[i]->position.z + entities[i]->collider.z) && this->position.z + this->collider.z >= (entities[i]->position.z - entities[i]->collider.z) ||
 					this->position.z - this->collider.z <= (entities[i]->position.z + entities[i]->collider.z) && this->position.z - this->collider.z >= (entities[i]->position.z - entities[i]->collider.z)))
 			{
+
+				if (entities[i]->tag == std::string("Wall")) {
+					entities[i]->velocity = this->velocity * -1.0f;
+					entities[i]->weight = this->weight;
+					std::cout << "Collision" << std::endl;
+				}
 				
 				if (entities[i]->tag == std::string("Floor")) {
 					entities[i]->velocity = glm::vec3(0.f, 0.f, 0.f);
@@ -127,7 +133,8 @@ void GameEntity::CheckCollisions(std::vector<GameEntity*> entities, int num, irr
 				glm::vec3 positionDiff = ((entities[i]->position + entities[i]->velocity) - (this->position + this->velocity));
 				
 				if (entities[i]->tag != std::string("Floor")) {
-					if (positionDiff.x != 0 && abs(positionDiff.x) > abs(positionDiff.y) && abs(positionDiff.x) > abs(positionDiff.z))
+					//if (positionDiff.x != 0 && abs(positionDiff.x) > abs(positionDiff.y) && abs(positionDiff.x) > abs(positionDiff.z))
+					if (positionDiff.x != 0)
 					{
 						if (positionDiff.x < 0 && this->velocity.x < 0)
 						{
@@ -152,7 +159,8 @@ void GameEntity::CheckCollisions(std::vector<GameEntity*> entities, int num, irr
 					}
 				}
 
-				if ((positionDiff.y != 0 && abs(positionDiff.y) > abs(positionDiff.x) && abs(positionDiff.y) > abs(positionDiff.z)) || entities[i]->tag == std::string("Floor"))
+				//if ((positionDiff.y != 0 && abs(positionDiff.y) > abs(positionDiff.x) && abs(positionDiff.y) > abs(positionDiff.z)) || entities[i]->tag == std::string("Floor"))
+				if ((positionDiff.y != 0) || entities[i]->tag == std::string("Floor"))
 				{
 					if (positionDiff.y < 0 && this->velocity.y < 0)
 					{
@@ -182,7 +190,8 @@ void GameEntity::CheckCollisions(std::vector<GameEntity*> entities, int num, irr
 					}
 				}
 
-				if (positionDiff.z != 0 && abs(positionDiff.z) > abs(positionDiff.x) && abs(positionDiff.z) > abs(positionDiff.x))
+				//if (positionDiff.z != 0 && abs(positionDiff.z) > abs(positionDiff.x) && abs(positionDiff.z) > abs(positionDiff.x))
+				if (positionDiff.z != 0)
 				{
 					if (positionDiff.z < 0 && this->velocity.z < 0)
 					{
