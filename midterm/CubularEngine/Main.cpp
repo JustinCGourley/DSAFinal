@@ -21,6 +21,7 @@ void SetupSLERPExample(Mesh *, Material *);
 Camera* CreateCamera(glm::vec3 pos, glm::vec3 forward, glm::vec3 up, int width, int height, GLFWwindow *window, bool controllable);
 void CreatePhysicsExample1(Mesh *mesh, Material *mat);
 void CheckUpdateCameras();
+void QuadTree(std::vector<GameEntity*> quadify, GameEntity* floor, glm::vec3 center, irrklang::ISoundEngine* sound);
 
 std::vector<GameEntity*> gameEntities;
 std::vector<GameEntity*> staticEntities;
@@ -415,10 +416,12 @@ int main()
 				staticEntities[i]->Update(staticEntities, i, engine);
 			}
 
-			for (int i = 0; i < octreeEntities.size(); i++)
+			/*for (int i = 0; i < octreeEntities.size(); i++)
 			{
 				octreeEntities[i]->Update(octreeEntities, i, engine);
-			}
+			}*/
+
+			QuadTree(octreeEntities, floor, glm::vec3(0.f, -7.f, -70.f), engine);
 
 			cameras[curCamera]->Update();
 
@@ -842,7 +845,7 @@ void CreatePhysicsExample1(Mesh *mesh, Material *mat)
 		false,
 		glm::vec3(20.f, 2.f, 2.f),
 		1,
-		"WallZ",
+		"Wall",
 		glm::vec3(0.f, 0.f, 0.f)
 	);
 
@@ -856,7 +859,7 @@ void CreatePhysicsExample1(Mesh *mesh, Material *mat)
 		false,
 		glm::vec3(20.f, 2.f, 2.f),
 		1,
-		"WallZ",
+		"Wall",
 		glm::vec3(0.f, 0.f, 0.f)
 	);
 
@@ -870,7 +873,7 @@ void CreatePhysicsExample1(Mesh *mesh, Material *mat)
 		false,
 		glm::vec3(2.f, 2.f, 20.f),
 		1,
-		"WallX",
+		"Wall",
 		glm::vec3(0.f, 0.f, 0.f)
 	);
 
@@ -884,7 +887,7 @@ void CreatePhysicsExample1(Mesh *mesh, Material *mat)
 		false,
 		glm::vec3(2.f, 2.f, 20.f),
 		1,
-		"WallX",
+		"Wall",
 		glm::vec3(0.f, 0.f, 0.f)
 	);
 
@@ -894,7 +897,7 @@ void CreatePhysicsExample1(Mesh *mesh, Material *mat)
 	octreeEntities.push_back(wall4);
 
 	//create a bunch of entities to move around (and apply random forces to each one)
-	int cubeCount = 50;
+	int cubeCount = 35;
 	srand(time(NULL));
 
 	for (int i = 0; i < cubeCount; i++)
@@ -920,11 +923,70 @@ void CreatePhysicsExample1(Mesh *mesh, Material *mat)
 		float dirX = -0.5f + (static_cast <float> (rand() / (static_cast <float> (RAND_MAX / (0.5f - (-0.5f))))));
 		float dirZ = -0.5f + (static_cast <float> (rand() / (static_cast <float> (RAND_MAX / (0.5f - (-0.5f))))));
 
-		glm::vec3 randomForce = glm::vec3(dirX, 0.f, 0.0f);
+		glm::vec3 randomForce = glm::vec3(dirX, 0.0f, 0.0f);
 
 		cube->ApplyForce(randomForce);
 
 		octreeEntities.push_back(cube);
+	}
+}
+
+//QuadTree
+void QuadTree(std::vector<GameEntity*> quadify, GameEntity* floor, glm::vec3 center, irrklang::ISoundEngine* sound) {
+
+	std::vector<GameEntity*> topRight;
+	std::vector<GameEntity*> bottomRight;
+	std::vector<GameEntity*> bottomLeft;
+	std::vector<GameEntity*> topLeft;
+
+	/*topRight.push_back(floor);
+	bottomRight.push_back(floor);
+	bottomLeft.push_back(floor);
+	topLeft.push_back(floor);*/
+
+	for (int i = 0; i < quadify.size(); i++)
+	{
+		if (quadify[i]->tag == std::string("Floor")  || quadify[i]->tag == std::string("Wall")) {
+			topRight.push_back(quadify[i]);
+			bottomRight.push_back(quadify[i]);
+			bottomLeft.push_back(quadify[i]);
+			topLeft.push_back(quadify[i]);
+		}
+
+		if (quadify[i]->position.x >= center.x && quadify[i]->position.z >= center.z && quadify[i]->tag != std::string("Floor") && quadify[i]->tag != std::string("Wall")) {
+			topRight.push_back(quadify[i]);
+		}
+		else if (quadify[i]->position.x >= center.x && quadify[i]->position.z <= center.z && quadify[i]->tag != std::string("Floor") && quadify[i]->tag != std::string("Wall")) {
+			bottomRight.push_back(quadify[i]);
+		}
+		else if (quadify[i]->position.x <= center.x && quadify[i]->position.z <= center.z && quadify[i]->tag != std::string("Floor") && quadify[i]->tag != std::string("Wall")) {
+			bottomLeft.push_back(quadify[i]);
+		}
+		else if (quadify[i]->position.x <= center.x && quadify[i]->position.z >= center.z && quadify[i]->tag != std::string("Floor") && quadify[i]->tag != std::string("Wall")) {
+			topLeft.push_back(quadify[i]);
+		}
+	}
+
+	for (int i = 0; i < topRight.size(); i++)
+	{
+		std::cout << "Top Right Quad: " << topRight.size() << std::endl;
+		topRight[i]->Update(topRight, i, sound);
+	}
+
+	for (int i = 0; i < bottomRight.size(); i++)
+	{
+		//std::cout << "Top Right Quad: " << topRight.size() << std::endl;
+		bottomRight[i]->Update(bottomRight, i, sound);
+	}
+
+	for (int i = 0; i < bottomLeft.size(); i++)
+	{
+		bottomLeft[i]->Update(bottomLeft, i, sound);
+	}
+
+	for (int i = 0; i < topLeft.size(); i++)
+	{
+		topLeft[i]->Update(topLeft, i, sound);
 	}
 }
 
