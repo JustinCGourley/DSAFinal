@@ -412,12 +412,12 @@ int main()
 
 			for (int i = 0; i < staticEntities.size(); i++)
 			{
-				staticEntities[i]->Update(staticEntities, i);
+				staticEntities[i]->Update(staticEntities, i, engine);
 			}
 
 			for (int i = 0; i < octreeEntities.size(); i++)
 			{
-				octreeEntities[i]->Update(octreeEntities, i);
+				octreeEntities[i]->Update(octreeEntities, i, engine);
 			}
 
 			cameras[curCamera]->Update();
@@ -841,7 +841,8 @@ void CreatePhysicsExample1(Mesh *mesh, Material *mat)
 		false,
 		glm::vec3(20.f, 2.f, 2.f),
 		1,
-		"Wall"
+		"Wall",
+		glm::vec3(0.f, 0.f, 0.f)
 	);
 
 	GameEntity* wall2 = new GameEntity(
@@ -854,7 +855,8 @@ void CreatePhysicsExample1(Mesh *mesh, Material *mat)
 		false,
 		glm::vec3(20.f, 2.f, 2.f),
 		1,
-		"Wall"
+		"Wall",
+		glm::vec3(0.f, 0.f, 0.f)
 	);
 
 	GameEntity* wall3 = new GameEntity(
@@ -867,7 +869,8 @@ void CreatePhysicsExample1(Mesh *mesh, Material *mat)
 		false,
 		glm::vec3(2.f, 2.f, 20.f),
 		1,
-		"Wall"
+		"Wall",
+		glm::vec3(0.f, 0.f, 0.f)
 	);
 
 	GameEntity* wall4 = new GameEntity(
@@ -880,7 +883,8 @@ void CreatePhysicsExample1(Mesh *mesh, Material *mat)
 		false,
 		glm::vec3(2.f, 2.f, 20.f),
 		1,
-		"Wall"
+		"Wall",
+		glm::vec3(0.f, 0.f, 0.f)
 	);
 
 	octreeEntities.push_back(wall1);
@@ -908,7 +912,8 @@ void CreatePhysicsExample1(Mesh *mesh, Material *mat)
 			true,
 			glm::vec3(0.2f, 0.2f, 0.2f),
 			1,
-			"Object"
+			"Object",
+			glm::vec3(0.f, 0.f, 0.f)
 		);
 
 		float dirX = -0.5f + (static_cast <float> (rand() / (static_cast <float> (RAND_MAX / (0.5f - (-0.5f))))));
