@@ -70,7 +70,7 @@ int main()
 
 	engine->setSoundVolume(0.03f);
 
-	//engine->play2D("../libraries/irrKlang-1.5.0/media/explosion.wav", true);
+	engine->play2D("../libraries/irrKlang-1.5.0/media/LastTrainHome.mp3", true);
 
     {
         //init GLFW
