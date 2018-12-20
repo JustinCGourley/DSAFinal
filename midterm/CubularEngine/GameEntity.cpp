@@ -113,11 +113,6 @@ void GameEntity::CheckCollisions(std::vector<GameEntity*> entities, int num, irr
 				(this->position.z + this->collider.z <= (entities[i]->position.z + entities[i]->collider.z) && this->position.z + this->collider.z >= (entities[i]->position.z - entities[i]->collider.z) ||
 					this->position.z - this->collider.z <= (entities[i]->position.z + entities[i]->collider.z) && this->position.z - this->collider.z >= (entities[i]->position.z - entities[i]->collider.z)))
 			{
-
-				if (entities[i]->tag == std::string("Wall")) {
-					entities[i]->velocity = this->velocity * -1.0f;
-					entities[i]->weight = this->weight;
-				}
 				
 				if (entities[i]->tag == std::string("Floor")) {
 					entities[i]->velocity = glm::vec3(0.f, 0.f, 0.f);
@@ -130,6 +125,10 @@ void GameEntity::CheckCollisions(std::vector<GameEntity*> entities, int num, irr
 
 				//glm::vec3 positionDiff = (entities[i]->position - this->position) - (entities[i]->position - (this->position + this->velocity));
 				glm::vec3 positionDiff = ((entities[i]->position + entities[i]->velocity) - (this->position + this->velocity));
+
+				if (entities[i]->tag == std::string("WallX")  || entities[i]->tag == std::string("WallZ")) {
+					entities[i]->velocity = this->velocity * -1.0f;
+				}
 				
 				if (entities[i]->tag != std::string("Floor")) {
 					//if (positionDiff.x != 0 && abs(positionDiff.x) > abs(positionDiff.y) && abs(positionDiff.x) > abs(positionDiff.z))
@@ -140,20 +139,32 @@ void GameEntity::CheckCollisions(std::vector<GameEntity*> entities, int num, irr
 							float overshot = (this->position.x - this->collider.x) - (entities[i]->position.x + entities[i]->collider.x);
 							this->position.x -= overshot;
 
-							float thisVel = UpdateLinearMomentum(this->velocity.x, this->weight, entities[i]->velocity.x, entities[i]->weight);
-							float entityVel = UpdateLinearMomentum(entities[i]->velocity.x, entities[i]->weight, this->velocity.x, this->weight);
-							this->velocity.x = thisVel;
-							entities[i]->velocity.x = entityVel;
+							if (entities[i]->tag == std::string("WallX")) {
+								this->velocity.x = this->velocity.x * -1.0f;
+							}
+
+							if (entities[i]->tag != std::string("WallX") && entities[i]->tag != std::string("WallZ")) {
+								float thisVel = UpdateLinearMomentum(this->velocity.x, this->weight, entities[i]->velocity.x, entities[i]->weight);
+								float entityVel = UpdateLinearMomentum(entities[i]->velocity.x, entities[i]->weight, this->velocity.x, this->weight);
+								this->velocity.x = thisVel;
+								entities[i]->velocity.x = entityVel;
+							}
 						}
 						else if (positionDiff.x > 0 && this->velocity.x > 0)
 						{
 							float overshot = (this->position.x + this->collider.x) - (entities[i]->position.x - entities[i]->collider.x);
 							this->position.x -= overshot;
 
-							float thisVel = UpdateLinearMomentum(this->velocity.x, this->weight, entities[i]->velocity.x, entities[i]->weight);
-							float entityVel = UpdateLinearMomentum(entities[i]->velocity.x, entities[i]->weight, this->velocity.x, this->weight);
-							this->velocity.x = thisVel;
-							entities[i]->velocity.x = entityVel;
+							if (entities[i]->tag == std::string("WallX")) {
+								this->velocity.x = this->velocity.x * -1.0f;
+							}
+
+							if (entities[i]->tag != std::string("WallX") && entities[i]->tag != std::string("WallZ")) {
+								float thisVel = UpdateLinearMomentum(this->velocity.x, this->weight, entities[i]->velocity.x, entities[i]->weight);
+								float entityVel = UpdateLinearMomentum(entities[i]->velocity.x, entities[i]->weight, this->velocity.x, this->weight);
+								this->velocity.x = thisVel;
+								entities[i]->velocity.x = entityVel;
+							}
 						}
 					}
 				}
@@ -167,20 +178,32 @@ void GameEntity::CheckCollisions(std::vector<GameEntity*> entities, int num, irr
 							float overshot = (this->position.z - this->collider.z) - (entities[i]->position.z + entities[i]->collider.z);
 							this->position.z -= overshot;
 
-							float thisVel = UpdateLinearMomentum(this->velocity.z, this->weight, entities[i]->velocity.z, entities[i]->weight);
-							float entityVel = UpdateLinearMomentum(entities[i]->velocity.z, entities[i]->weight, this->velocity.z, this->weight);
-							this->velocity.z = thisVel;
-							entities[i]->velocity.z = entityVel;
+							if (entities[i]->tag == std::string("WallZ")) {
+								this->velocity.z = this->velocity.z * -1.0f;
+							}
+
+							if (entities[i]->tag != std::string("WallX") && entities[i]->tag != std::string("WallZ")) {
+								float thisVel = UpdateLinearMomentum(this->velocity.z, this->weight, entities[i]->velocity.z, entities[i]->weight);
+								float entityVel = UpdateLinearMomentum(entities[i]->velocity.z, entities[i]->weight, this->velocity.z, this->weight);
+								this->velocity.z = thisVel;
+								entities[i]->velocity.z = entityVel;
+							}
 						}
 						else if (positionDiff.z > 0 && this->velocity.z > 0)
 						{
 							float overshot = (this->position.z + this->collider.z) - (entities[i]->position.z - entities[i]->collider.z);
 							this->position.z -= overshot;
 
-							float thisVel = UpdateLinearMomentum(this->velocity.z, this->weight, entities[i]->velocity.z, entities[i]->weight);
-							float entityVel = UpdateLinearMomentum(entities[i]->velocity.z, entities[i]->weight, this->velocity.z, this->weight);
-							this->velocity.z = thisVel;
-							entities[i]->velocity.z = entityVel;
+							if (entities[i]->tag == std::string("WallZ")) {
+								this->velocity.z = this->velocity.z * -1.0f;
+							}
+
+							if(entities[i]->tag != std::string("WallX") && entities[i]->tag != std::string("WallZ")){
+								float thisVel = UpdateLinearMomentum(this->velocity.z, this->weight, entities[i]->velocity.z, entities[i]->weight);
+								float entityVel = UpdateLinearMomentum(entities[i]->velocity.z, entities[i]->weight, this->velocity.z, this->weight);
+								this->velocity.z = thisVel;
+								entities[i]->velocity.z = entityVel;
+							}
 						}
 					}
 				}
@@ -214,11 +237,6 @@ void GameEntity::CheckCollisions(std::vector<GameEntity*> entities, int num, irr
 						this->velocity.y = thisVel;
 						entities[i]->velocity.y = entityVel;
 					}
-				}
-
-				if (entities[i]->tag == std::string("Wall")) {
-					entities[i]->velocity = glm::vec3(0.f,0.f,0.f);
-					entities[i]->weight = 1;
 				}
 			}
 		}
