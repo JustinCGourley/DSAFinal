@@ -1,6 +1,12 @@
 #include "GameEntity.h"
 #include "glm/gtc/matrix_transform.hpp"
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include "glm/gtc/quaternion.hpp"
+#include "glm/gtx/quaternion.hpp"
+
+#include "glm/gtx/transform2.hpp"
+
 GameEntity::GameEntity(
 	Mesh * mesh, 
     Material * material,
@@ -11,7 +17,8 @@ GameEntity::GameEntity(
 	bool applyPhysics,
 	glm::vec3 collider,
 	float weight,
-	std::string tag)
+	std::string tag,
+	glm::vec3 shear)
 {
     this->mesh = mesh;
     this->material = material;
@@ -27,20 +34,21 @@ GameEntity::GameEntity(
 	this->weight = weight;
 	this->velocity = glm::vec3(0, 0, 0);
 	this->tag = tag;
-	this->alpha = 1.f;
+
+	this->shear = shear;
 }
 
 GameEntity::~GameEntity()
 {
 }
 
-void GameEntity::Update(std::vector<GameEntity*> entities, int num)
+void GameEntity::Update(std::vector<GameEntity*> entities, int num, irrklang::ISoundEngine* engine)
 {
 
 	if (this->applyPhysics)
 	{
 		this->UpdatePhysics();
-		this->CheckCollisions(entities, num);
+		this->CheckCollisions(entities, num, engine);
 		this->UpdatePosition();
 	}
 	else {
@@ -49,7 +57,12 @@ void GameEntity::Update(std::vector<GameEntity*> entities, int num)
 
 	worldMatrix = glm::translate(glm::identity<glm::mat4>(),
 		this->position);
-	worldMatrix = glm::rotate(worldMatrix,
+
+	worldMatrix = glm::shearX3D(worldMatrix, this->shear.y, this->shear.z);
+	worldMatrix = glm::shearY3D(worldMatrix, this->shear.x, this->shear.z);
+	worldMatrix = glm::shearZ3D(worldMatrix, this->shear.x, this->shear.y);
+
+	/*worldMatrix = glm::rotate(worldMatrix,
 		this->eulerAngles.y,
 		glm::vec3(0.f, 1.f, 0.f)
 	);
@@ -60,7 +73,12 @@ void GameEntity::Update(std::vector<GameEntity*> entities, int num)
 	worldMatrix = glm::rotate(worldMatrix,
 		this->eulerAngles.z,
 		glm::vec3(0.f, 0.f, 1.f)
-	);
+	);*/
+
+	glm::mat4 rotationMatrix = glm::toMat4(glm::quat(glm::vec3(eulerAngles.x, eulerAngles.y, eulerAngles.z)));
+
+	worldMatrix = worldMatrix * rotationMatrix;
+
 	worldMatrix = glm::scale(worldMatrix, this->scale);
 
 	
@@ -80,7 +98,7 @@ void GameEntity::UpdatePhysics()
 	//check collisions
 }
 
-void GameEntity::CheckCollisions(std::vector<GameEntity*> entities, int num)
+void GameEntity::CheckCollisions(std::vector<GameEntity*> entities, int num, irrklang::ISoundEngine* engine)
 {
 	for (int i = 0; i < entities.size(); i++)
 	{
@@ -99,6 +117,10 @@ void GameEntity::CheckCollisions(std::vector<GameEntity*> entities, int num)
 				if (entities[i]->tag == std::string("Floor")) {
 					entities[i]->velocity = glm::vec3(0.f, 0.f, 0.f);
 					entities[i]->weight = this->weight;
+				}
+
+				if (entities[i]->tag == std::string("Cube")) {
+					engine->play2D("../libraries/irrKlang-1.5.0/media/explosion.wav", false);
 				}
 
 				//glm::vec3 positionDiff = (entities[i]->position - this->position) - (entities[i]->position - (this->position + this->velocity));
@@ -210,6 +232,6 @@ void GameEntity::ApplyForce(glm::vec3 force)
 
 void GameEntity::Render(Camera* camera)
 {
-    material->Bind(camera, worldMatrix, color, alpha);
+    material->Bind(camera, worldMatrix, color);
     mesh->Render();
 }

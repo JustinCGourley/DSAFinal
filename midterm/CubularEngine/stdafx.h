@@ -17,3 +17,4 @@
 #endif
 
 #include <string>
+#include "irrKlang.h"

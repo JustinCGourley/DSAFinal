@@ -5,7 +5,6 @@
 #include "GameEntity.h"
 #include "Material.h"
 #include "Input.h"
-#include "irrKlang.h"
 #include "BezierCurve.h"
 #include "Interpolate.h"
 
@@ -63,7 +62,9 @@ int main()
 
 	irrklang::ISoundEngine* engine = irrklang::createIrrKlangDevice();
 
-	//engine->play2D("../libraries/irrKlang-1.5.0/media/getout.ogg", true);
+	engine->setSoundVolume(0.1f);
+
+	//engine->play2D("../libraries/irrKlang-1.5.0/media/explosion.wav", false);
 
     {
         //init GLFW
@@ -245,7 +246,8 @@ int main()
 			false,
 			glm::vec3(0.f, 0.f, 0.f),
 			0,
-			"Object"
+			"Object",
+			glm::vec3(0.f, 0.f, 0.f)
 		);
 
 		staticEntities.push_back(bezierCube);
@@ -261,7 +263,8 @@ int main()
 			false,
 			glm::vec3(0.f, 0.f, 0.f),
 			0,
-			"Object"
+			"Object",
+			glm::vec3(0.f, 0.f, 0.f)
 		);
 
 		staticEntities.push_back(scaleExample);
@@ -281,7 +284,8 @@ int main()
 			false,
 			glm::vec3(0.f, 0.f, 0.f),
 			0,
-			"Object"
+			"Object",
+			glm::vec3(0.f, 0.f, 0.f)
 		);
 
 		staticEntities.push_back(lerpExample);
@@ -301,7 +305,8 @@ int main()
 			false,
 			glm::vec3(0.f, 0.f, 0.f),
 			0,
-			"Object"
+			"Object",
+			glm::vec3(0.f, 0.f, 0.f)
 		);
 
 		staticEntities.push_back(slerpExample);
@@ -321,7 +326,8 @@ int main()
 			false,
 			glm::vec3(100.f, 1.f, 100.f),
 			1,
-			"Floor"
+			"Floor",
+			glm::vec3(0.f, 0.f, 0.f)
 		);
 
 		gameEntities.push_back(floor);
@@ -401,7 +407,7 @@ int main()
 
 			for (int i = 0; i < gameEntities.size(); i++)
 			{
-				gameEntities[i]->Update(gameEntities, i);
+				gameEntities[i]->Update(gameEntities, i, engine);
 			}
 
 			for (int i = 0; i < staticEntities.size(); i++)
@@ -463,6 +469,9 @@ int main()
                 glfwSwapBuffers(window);
             }
         }
+
+		//Delete Sound engine
+		engine->drop();
 
         //de-allocate our mesh!
         delete myMesh;
@@ -543,7 +552,8 @@ void CreateManyCubes(Mesh* myMesh, Material* myMaterial)
 			true,
 			glm::vec3(1.f, 1.f, 1.f),
 			1,
-			"Cube"
+			"Cube",
+			glm::vec3(0.f, 0.f, 0.f)
 		);
 		gameEntities.push_back(myGameEntity);
 	}
@@ -569,7 +579,8 @@ void CreateBezierExample(Mesh* bMesh, Material* bMat, BezierCurve* bezierCurve)
 			false,
 			glm::vec3(0.f, 0.f, 0.f),
 			0,
-			"Object"
+			"Object",
+			glm::vec3(0.f, 0.f, 0.f)
 		);
 		staticEntities.push_back(myGameEntity);
 	}
@@ -585,7 +596,8 @@ void CreateBezierExample(Mesh* bMesh, Material* bMat, BezierCurve* bezierCurve)
 		false,
 		glm::vec3(0.f, 0.f, 0.f),
 		0,
-		"Object"
+		"Object",
+		glm::vec3(0.f, 0.f, 0.f)
 	);
 
 	pos = bezierCurve->GetPoint(1);
@@ -599,7 +611,8 @@ void CreateBezierExample(Mesh* bMesh, Material* bMat, BezierCurve* bezierCurve)
 		false,
 		glm::vec3(0.f, 0.f, 0.f),
 		0,
-		"Object"
+		"Object",
+		glm::vec3(0.f, 0.f, 0.f)
 	);
 
 	staticEntities.push_back(start);
@@ -649,7 +662,9 @@ void UpdateScaleExample(GameEntity *gameObj)
 	}
 
 	gameObj->scale = scaleSet;
-	gameObj->eulerAngles.y += 0.001f;
+	gameObj->eulerAngles.y += 0.009f;
+	gameObj->eulerAngles.x += 0.006f;
+	gameObj->eulerAngles.z += 0.003f;
 }
 
 // ========================================================== create LERP example
@@ -672,7 +687,8 @@ void SetupLERPExample(Mesh *bMesh, Material *bMat)
 			false,
 			glm::vec3(0.f, 0.f, 0.f),
 			0,
-			"Object"
+			"Object",
+			glm::vec3(0.f, 0.f, 0.f)
 		);
 
 		staticEntities.push_back(obj);
@@ -689,7 +705,8 @@ void SetupLERPExample(Mesh *bMesh, Material *bMat)
 		false,
 		glm::vec3(0.f, 0.f, 0.f),
 		0,
-		"Object"
+		"Object",
+		glm::vec3(0.f, 0.f, 0.f)
 	);
 	GameEntity* lerpEndObj = new GameEntity(
 		bMesh,
@@ -701,7 +718,8 @@ void SetupLERPExample(Mesh *bMesh, Material *bMat)
 		false,
 		glm::vec3(0.f, 0.f, 0.f),
 		0,
-		"Object"
+		"Object",
+		glm::vec3(0.f, 0.f, 0.f)
 	);
 
 	staticEntities.push_back(lerpStartObj);
@@ -729,7 +747,8 @@ void SetupSLERPExample(Mesh *bMesh, Material *bMat)
 			false,
 			glm::vec3(0.f, 0.f, 0.f),
 			0,
-			"Object"
+			"Object",
+			glm::vec3(0.f, 0.f, 0.f)
 		);
 
 		staticEntities.push_back(obj);
@@ -746,7 +765,8 @@ void SetupSLERPExample(Mesh *bMesh, Material *bMat)
 		false,
 		glm::vec3(0.f, 0.f, 0.f),
 		0,
-		"Object"
+		"Object",
+		glm::vec3(0.f, 0.f, 0.f)
 	);
 	GameEntity* slerpEndObj = new GameEntity(
 		bMesh,
@@ -758,7 +778,8 @@ void SetupSLERPExample(Mesh *bMesh, Material *bMat)
 		false,
 		glm::vec3(0.f, 0.f, 0.f),
 		0,
-		"Object"
+		"Object",
+		glm::vec3(0.f, 0.f, 0.f)
 	);
 
 	staticEntities.push_back(slerpStartObj);

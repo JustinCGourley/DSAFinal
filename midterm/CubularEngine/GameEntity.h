@@ -20,7 +20,7 @@ private:
 	glm::vec3 collider;
 
 	void UpdatePhysics();
-	void CheckCollisions(std::vector<GameEntity*>, int num);
+	void CheckCollisions(std::vector<GameEntity*>, int num, irrklang::ISoundEngine* engine);
 	float UpdateLinearMomentum(float vel1, float mass1, float vel2, float mass2);
 	void UpdatePosition();
 
@@ -39,7 +39,8 @@ public:
 		bool applyPhysics,
 		glm::vec3 collider,
 		float weight,
-		std::string tag
+		std::string tag,
+		glm::vec3 shear
     );
 
 	glm::vec3 position;
@@ -51,6 +52,7 @@ public:
 	float weight;
 	float alpha;
 	std::string tag;
+	glm::vec3 shear;
     /// <summary>
     /// Destruction
     /// </summary>
@@ -65,7 +67,7 @@ public:
     /// </summary>
     void Render(Camera* camera);
 
-	virtual void Update(std::vector<GameEntity*>, int num);
+	virtual void Update(std::vector<GameEntity*>, int num, irrklang::ISoundEngine* engine);
 
 	void ApplyForce(glm::vec3 force);
 
